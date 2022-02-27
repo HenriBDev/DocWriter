@@ -1,0 +1,36 @@
+{
+  "name": "pdfmaker",
+  "version": "1.0.0",
+  "description": "Discord bot that transforms text messages into PDF files",
+  "main": "index.js",
+  "scripts": {
+    "startbot": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HenriBDev/PDFMaker.git"
+  },
+  "keywords": [
+    "text-to-pdf",
+    "pdf",
+    "message",
+    "text"
+  ],
+  "author": "HenriBDev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HenriBDev/PDFMaker/issues"
+  },
+  "homepage": "https://github.com/HenriBDev/PDFMaker#readme",
+  "devDependencies": {
+    "eslint": "^8.10.0",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
+    "discord-api-types": "^0.27.3",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0"
+  }
+}
