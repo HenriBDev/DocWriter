@@ -4,7 +4,7 @@
   "description": "Discord bot that transforms text messages into PDF files",
   "main": "index.js",
   "scripts": {
-    "startbot": "nodemon index.js"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
   "dependencies": {
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
-    "jspdf": "^2.5.1"
+    "puppeteer": "^13.4.0",
+    "sanitize-filename": "^1.6.3"
   }
 }
