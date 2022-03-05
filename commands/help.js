@@ -21,11 +21,11 @@ module.exports = {
 			
 				// Command parameters
 				command.data.params.forEach(param => {
-					helpString += param ? "\`" + param + "\`" : "";
+					helpString += param ? "\`" + param + "\` " : "";
 				});
 			
 				// Command description
-				helpString += " -> " + command.data.description;
+				helpString += "-> " + command.data.description;
 		    }
 		})
 		return messageSent.reply(helpString);

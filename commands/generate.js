@@ -9,10 +9,11 @@ module.exports = {
 	data: {
 		name: 'generate',
 		params: ['<file_name>'],
-		description: "Generate a .pdf file formatted in HTML, using the user's last text message"
+		description: "Generates a PDF file using the user's last text message"
 	},
 	async execute(messageSent){
-		let fileName = messageSent.content.split(' ')[1];
+		const messageSplit = messageSent.content.split(' ')
+		let fileName = messageSplit[1];
 
 		if(!fileName){
 			// User didn't specify a name for the file
@@ -38,13 +39,14 @@ module.exports = {
 		}
 
 		senderLastMessage = senderMessages.at(1).content;
-		const { browser } = require(`..${path.sep}instances${path.sep}chromium`);
-		pdfPage = await browser.newPage();
-		await pdfPage.setContent(senderLastMessage);
+		const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		startMount();
+		addContent(senderLastMessage);
+		const docFinished = await finishMount();
 		let pdfFile;
-		await pdfPage.pdf().then(file => pdfFile = file);
+		pdfFile = await docFinished.pdf();
 		let pdfPreview;
-		await pdfPage.screenshot().then(preview => pdfPreview = preview);
+		await docFinished.screenshot({fullPage: true}).then(preview => pdfPreview = preview);
 		return await messageSent.reply({files: [
 			{
 				name: "preview.png",

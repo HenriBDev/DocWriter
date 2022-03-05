@@ -12,6 +12,8 @@ const { Client, Intents, Collection } = require('discord.js');
 // Instance
 module.exports = {
     client: null,
+    executingCommand: false,
+    toggleCommandExecution(){module.exports.executingCommand = !module.exports.executingCommand},
     BOT_TOKEN: process.env.BOT_TOKEN,
     PREFIX: "pdf|",
     instantiateClient(){

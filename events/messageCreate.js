@@ -1,8 +1,9 @@
 // Node modules
 const path = require('path');
 
-// Getting prefix
-const { PREFIX } = require(`..${path.sep}instances${path.sep}client`);
+// Getting prefix and command execution toggle
+const clientPath = `..${path.sep}instances${path.sep}client`
+const { PREFIX, toggleCommandExecution } = require(clientPath);
 
 // Event
 module.exports = {
@@ -11,29 +12,43 @@ module.exports = {
     execute(message){
 
         // Check if the message is a bot command (has prefix)
-        if (isCommand(message)) {
-            const { client } = require(`..${path.sep}instances${path.sep}client`)
-            let command;
-            try{
+        if (!isCommand(message)) return 
 
-                // Checks if command exists
-                command = getCommand(client, message);
-                if (!command){
-                    throw false;
-                }
-            }
-            catch{
+        // Check if there is another command in execution
+        const { executingCommand } = require(clientPath);
+        if (executingCommand) return
 
-                // Shows help if user types wrong command with the prefix
-                command = client.commands.get('help');
-            }
-            try {
+        const { client } = require(clientPath);
+        let command;
+        try{
 
-                // Executes response
-                command.execute(message).then(() => message.delete());
-            } catch (error) {
-                console.error(error);
+            // Checks if command exists
+            command = getCommand(client, message);
+            if (!command){
+                throw false;
             }
+            
+        }
+        catch{
+
+            // Shows help if user types wrong command with the prefix
+            command = client.commands.get('help');
+
+        }
+        try {
+
+            // Responds command
+            toggleCommandExecution();
+            command.execute(message).then(() => {
+
+                // Finishes command execution
+                message.delete()
+                toggleCommandExecution();
+
+            });
+
+        } catch (error) {
+            console.error(error);
         }
     }
 }
