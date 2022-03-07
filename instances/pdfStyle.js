@@ -1,6 +1,9 @@
 // Node modules
 const path = require('path');
 
+// Text Parser
+const { toHTML } = require('discord-markdown');
+
 module.exports = {
     style: {
         margin: {
@@ -28,89 +31,102 @@ module.exports = {
             firstLineIndentation: false
         }
     },
-    pdfContent: null,
+    pdfHtmlContent: null,
+    pdfStyleContent: null,
     mounting: false,
+    spans: 0,
     startMount(){
-        const styleObj = module.exports.style;
-        module.exports.pdfContent = (
+        const styleObject = module.exports.style;
+        module.exports.pdfHtmlContent = (
             '<!DOCTYPE html>' +
             '<html>' +
                 '<body>' +
-                    '<div style=" ' +
-                        `padding: ${styleObj.margin.top} ${styleObj.margin.right} ${styleObj.margin.bottom} ${styleObj.margin.left}; ` +
-                        'overflow-wrap: anywhere;' +
-                    '">'
+                    '<div class="page">'
         );
+        module.exports.pdfStyleContent = (
+            '.page{' +
+                `padding: ${styleObject.margin.top} ${styleObject.margin.right} ${styleObject.margin.bottom} ${styleObject.margin.left};` +
+                'overflow-wrap: anywhere;' +
+            '}'
+        )
         module.exports.mounting = true;
     },
     async finishMount(){
-        module.exports.pdfContent += (
+        module.exports.pdfHtmlContent += (
                     "</div>" +
                 "</body>" +
             "</html>");
         const { browser } = require(`.${path.sep}browser`);
         const finishedFile = await browser.newPage();
-        finishedFile.setContent(module.exports.pdfContent);
+        await finishedFile.setContent(module.exports.pdfHtmlContent);
+        await finishedFile.addStyleTag({content: module.exports.pdfStyleContent});
         module.exports.mounting = false;
         return finishedFile;
     },
-    addContent(content){
+    addContent(textMessage){
 
-        // Adds style to the content
-        const styleObj = module.exports.style;
-        let newPdfContent = module.exports.pdfContent;
-        let mountedStyle = mountStyle(styleObj);
-        newPdfContent += "<span " + mountedStyle;
+        // Parses Discord's Markdown and HTML entities
+        textMessage = toHTML(textMessage);
 
-        // Adds line breaks
-        content = content.replace(/(\n)/g,"<br>");
+        // Adds new span
+        module.exports.spans++;
+        const currentSpan = module.exports.spans;
+        let spanContent = "";
 
-        // Finishes style
-        newPdfContent += `${content}</span>`;
-        if (styleObj.font.superscript) newPdfContent += "</sup>";
-        if (styleObj.font.subscript) newPdfContent += "</sub>";
-        module.exports.pdfContent = newPdfContent;
+        // Adds style of the content
+        const styleObject = module.exports.style;
+        module.exports.pdfStyleContent += mountStyle(styleObject, currentSpan);
+
+        // Mounts span
+        if (styleObject.font.superscript) spanContent += "<sup>";
+        if (styleObject.font.subscript) spanContent += "<sub>";
+        spanContent = `<span id="span${module.exports.spans}">${textMessage}</span>`;
+        if (styleObject.font.superscript) spanContent += "</sup>";
+        if (styleObject.font.subscript) spanContent += "</sub>";
+        module.exports.pdfHtmlContent += spanContent;
         
     },
     async getPreviewFile(){
         const { browser } = require(`.${path.sep}browser`);
         const previewFile = await browser.newPage();
-        await previewFile.setContent(module.exports.pdfContent + 
+        await previewFile.setContent(module.exports.pdfHtmlContent + 
                     "</div>" +
                 "</body>" +
             "</html>");
+        await previewFile.addStyleTag({content: module.exports.pdfStyleContent});
         return previewFile;
     }
 }
 
 // Other functions
-function mountStyle(styleObj){
-    let styleString = ('style=" display: table; ' +
-        `font-family: ${styleObj.font.family}; ` +
-        `font-weight: ${styleObj.font.bold ? "bold; " : "normal; "}` +
-        `${styleObj.font.italic ? "font-style: italic; " : ""}`
+function mountStyle(styleObject, currentSpan){
+    let styleString = (
+        `#span${currentSpan}{` +
+            'display: table;' +
+            `font-family: ${styleObject.font.family}; ` +
+            `font-weight: ${styleObject.font.bold ? "bold; " : "normal; "}` +
+            `${styleObject.font.italic ? "font-style: italic; " : ""}`
     );
-    if(styleObj.font.dashed || styleObj.font.underline || styleObj.font.overline){
+    if(styleObject.font.dashed || styleObject.font.underline || styleObject.font.overline){
         styleString += "text-decoration:";
-        if(styleObj.font.dashed){
-            styleString += ` line-through${styleObj.font.dashed == "double" ? " double; " : "; "}`;
+        if(styleObject.font.dashed){
+            styleString += ` line-through${styleObject.font.dashed == "double" ? " double; " : "; "}`;
         }
         else{
             styleString += (
-                (styleObj.font.underline ? " underline" : "") +
-                (styleObj.font.overline ? " overline" : "") + "; "
+                (styleObject.font.underline ? " underline" : "") +
+                (styleObject.font.overline ? " overline" : "") + "; "
             );
         }
     }
-    styleString += (`font-size: ${styleObj.font.size}; ` +
-                    `color: ${styleObj.font.color}; ` +
-                    (styleObj.font.bgcolor ? `background-color: ${styleObj.font.bgcolor}; ` : "") +
-                    `text-align: ${styleObj.paragraph.align}; ` +
-                    `line-height: ${styleObj.paragraph.linesHeight}; ` +
-                    `${styleObj.paragraph.firstLineIndentation ? `text-indent: ${styleObj.paragraph.firstLineIndentation};` : ""}` +
-                    '">'
+    styleString += (
+            `font-size: ${styleObject.font.size}; ` +
+            `color: ${styleObject.font.color}; ` +
+            (styleObject.font.bgcolor ? `background-color: ${styleObject.font.bgcolor}; ` : "") +
+            `text-align: ${styleObject.paragraph.align}; ` +
+            `line-height: ${styleObject.paragraph.linesHeight}; ` +
+            `${styleObject.paragraph.firstLineIndentation ? `text-indent: ${styleObject.paragraph.firstLineIndentation};` : ""}` +
+        '}'
     );
-    if (styleObj.font.superscript) styleString += "<sup>"
-    if (styleObj.font.subscript) styleString += "<sub>"
-    return styleString
+    return styleString;
 }
