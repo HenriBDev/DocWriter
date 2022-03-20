@@ -8,10 +8,11 @@ module.exports = {
     },
     async execute(messageSent){
         const senderId = messageSent.author.id;
+		const currentChannel = messageSent.channel;
 		let senderMessages, senderLastMessage;
 
 		// Filters the user's messages
-		await messageSent.channel.messages.fetch()
+		await currentChannel.messages.fetch()
 			.then(channelMessages => {
 				senderMessages = channelMessages.filter(message => message.author.id === senderId ? true : false);
 			});
@@ -21,23 +22,20 @@ module.exports = {
 
 		if(senderMessages.size <= 1){
 			// User didn't send any text messages before command
-			return messageSent.reply("No text messages available.");
+			return currentChannel.send("No text messages available.");
 		}
 
 		senderLastMessage = senderMessages.at(1).content;
-        const { mounting, startMount, addContent, getPreviewFile } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+        const { mounting, startMount, addContent, getPreviewPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
-		addContent(senderLastMessage);
-		const pagePreview = await getPreviewFile();
-        let pdfPreview
-		pdfPreview = await pagePreview.screenshot({fullPage: true});
-		return await messageSent.reply({files: [
-			{
-				name: "preview.png",
-				attachment: pdfPreview
-			}
-		]});
+		await addContent(senderLastMessage, currentChannel);
+		let previewFiles = await getPreviewPages();
+		previewFiles = await Promise.all(previewFiles.map(async (page, index) => ({
+			name: `preview${index}.png`, 
+			attachment: await page.screenshot()
+		})));
+		return await currentChannel.send({content: "File preview:", files: previewFiles});
     }
 }

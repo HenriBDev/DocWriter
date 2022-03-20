@@ -12,12 +12,14 @@ module.exports = {
 		description: "Generates a PDF file using the user's last text message"
 	},
 	async execute(messageSent){
+		
+		const currentChannel = messageSent.channel;
 		const messageSplit = messageSent.content.split(' ')
 		let fileName = messageSplit[1];
 
 		if(!fileName){
 			// User didn't specify a name for the file
-			return await messageSent.reply("Please choose a name for the file!");
+			return await currentChannel.send("Please choose a name for the file!");
 		}
 
 		fileName = sanitize(fileName)
@@ -25,7 +27,7 @@ module.exports = {
 		let senderMessages, senderLastMessage;
 
 		// Filters the user's messages
-		await messageSent.channel.messages.fetch()
+		await currentChannel.messages.fetch()
 			.then(channelMessages => {
 				senderMessages = channelMessages.filter(message => message.author.id === senderId ? true : false);
 			});
@@ -35,27 +37,26 @@ module.exports = {
 
 		if(senderMessages.size <= 1){
 			// User didn't send any text messages before command
-			return messageSent.reply("No text messages available.");
+			return currentChannel.send("No text messages available.");
 		}
 
 		senderLastMessage = senderMessages.at(1).content;
-		const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { startMount, addContent, getPreviewPages, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		startMount();
-		addContent(senderLastMessage);
+		await addContent(senderLastMessage, currentChannel);
 		const docFinished = await finishMount();
 		let pdfFile;
-		pdfFile = await docFinished.pdf();
-		let pdfPreview;
-		await docFinished.screenshot({fullPage: true}).then(preview => pdfPreview = preview);
-		return await messageSent.reply({files: [
-			{
-				name: "preview.png",
-				attachment: pdfPreview
-			},
+		pdfFile = await docFinished.pdf({format: "A4"});
+		let previewFiles = await getPreviewPages();
+		previewFiles = await Promise.all(previewFiles.map(async (page, index) => ({
+			name: `preview${index}.png`, 
+			attachment: await page.screenshot()
+		})));
+		return await currentChannel.send({files: previewFiles.concat([
 			{
 				name: fileName + ".pdf", 
 				attachment: pdfFile
 			}
-		]});
+		])});
 	}
 };

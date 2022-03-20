@@ -9,6 +9,7 @@ module.exports = {
 		description: "Show all available commands for PDFMaker"
 	},
 	execute(messageSent){
+		const currentChannel = messageSent.channel;
 		const { client } = require(`..${path.sep}instances${path.sep}client`)
 		let helpString = "**Available commands:**\n\n**pdf|help** -> Show all available commands for PDFMaker";
 		client.commands.forEach(command => {
@@ -28,6 +29,6 @@ module.exports = {
 				helpString += "-> " + command.data.description;
 		    }
 		})
-		return messageSent.reply(helpString);
+		return currentChannel.send(helpString);
 	}
 };

@@ -39,11 +39,16 @@ module.exports = {
 
             // Responds command
             toggleCommandExecution();
-            command.execute(message).then(() => {
+            command.execute(message).then(async () => {
+
+                // Tries to delete the message if it's still there
+                try{
+                    await message.delete();
+                }catch{}
 
                 // Finishes command execution
-                message.delete()
                 toggleCommandExecution();
+                console.log(`[${new Date().toTimeString()}] Command finished execution.`);
 
             });
 
