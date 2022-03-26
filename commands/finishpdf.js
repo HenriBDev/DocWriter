@@ -1,6 +1,13 @@
 // Node modules
 const path = require('path');
 
+// Discord.js' select menu
+const { MessageSelectMenu } = require('discord.js');
+
+// pdfStyle functions
+const { finishMount, getPreviewPage } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+
+
 // Filename sanitizer
 const sanitize = require('sanitize-filename');
 
@@ -23,20 +30,30 @@ module.exports = {
 		}
 
 		fileName = sanitize(fileName)
-        const { finishMount, getPreviewPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+        const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		const docFinished = await finishMount();
 		let pdfFile;
-		pdfFile = await docFinished.pdf({format: "A4"});
-		let previewFiles = await getPreviewPages();
-		previewFiles = await Promise.all(previewFiles.map(async (page, index) => ({
-			name: `preview${index}.png`, 
-			attachment: await page.screenshot()
-		})));
-		return await currentChannel.send({files: previewFiles.concat([
+		pdfFile = await docFinished.pdf({format: "A4", pageRanges: `1-${totalPages}`});
+		let previewFile = await getPreviewPage();
+
+		// Creates select menu
+		const pageSelectMenu = new MessageSelectMenu({
+			customId: "select_menu"
+		});
+		for(let page = 1; page <= totalPages; page++){
+			pageSelectMenu.addOptions({
+				label: `Page ${page}/${totalPages}`,
+				value: `${page}`,
+				default: page == totalPages ? true : false
+			});
+		}
+
+		// Responds command
+		await currentChannel.send({files:[
 			{
 				name: fileName + ".pdf", 
 				attachment: pdfFile
 			}
-		])});
+		]});
     }
 }

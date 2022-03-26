@@ -1,4 +1,5 @@
 const path = require('path');
+const { MessageSelectMenu } = require('discord.js');
 
 module.exports = {
     data: {
@@ -25,17 +26,56 @@ module.exports = {
 			return currentChannel.send("No text messages available.");
 		}
 
+		// Adds text to document
 		senderLastMessage = senderMessages.at(1).content;
-        const { mounting, startMount, addContent, getPreviewPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+        const { mounting, startMount, addContent, getPreviewPage } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
 		await addContent(senderLastMessage, currentChannel);
-		let previewFiles = await getPreviewPages();
-		previewFiles = await Promise.all(previewFiles.map(async (page, index) => ({
-			name: `preview${index}.png`, 
-			attachment: await page.screenshot()
-		})));
-		return await currentChannel.send({content: "File preview:", files: previewFiles});
+		let previewFile = await getPreviewPage();
+
+		// Creates select menu
+		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const pageSelectMenu = new MessageSelectMenu({
+			customId: "select_menu"
+		});
+		for(let page = 1; page <= totalPages; page++){
+			pageSelectMenu.addOptions({
+				label: `Page ${page}/${totalPages}`,
+				value: `${page}`,
+				default: page == totalPages ? true : false
+			});
+		}
+
+		// Responds command
+		return await currentChannel.send(
+			{
+				content: "Pages preview:", 
+				files: [{
+					name: "preview.png",
+					attachment: previewFile
+				}],
+				components: [{
+					type: 1,
+					components: [{
+						type: 2,
+						label: "◀️",
+						customId: "backward_button",
+						style: "PRIMARY"
+					},
+					{
+						type: 2,
+						label: "▶️",
+						customId: "forward_button",
+						style: "PRIMARY"
+					}]
+				},
+				{
+					type: 1,
+					components: [pageSelectMenu]
+				}]	
+			}
+		);
     }
 }

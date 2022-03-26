@@ -1,6 +1,3 @@
-// Node modules
-const path = require('path');
-
 // Event
 module.exports = {
     eventType: "once",

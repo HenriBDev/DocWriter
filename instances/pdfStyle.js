@@ -5,40 +5,38 @@ const path = require('path');
 const { toHTML } = require('discord-markdown');
 
 // Page (A4 paper) height in pixels (96 dpi)
-const PAGE_DEFAULT_HEIGHT = 1123;
+const PAGE_DEFAULT_HEIGHT = 1122.5;
+
+// Reset CSS string
+const RESET_CSS = "/* http://meyerweb.com/eric/tools/css/reset/ v2.0 | 20110126License: none (public domain)*/html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, em, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body {line-height: 1;}ol, ul {list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after,q:before, q:after {content: '';content: none;}table {border-collapse: collapse;border-spacing: 0;}";
 
 module.exports = {
     style: {
-        padding: {
-            top: "2.5cm",
-            bottom: "2.5cm",
-            left: "3cm",
-            right: "3cm"
-        },
-        font: {
-            family: 'calibri',
-            bold: false,
-            italic: false,
-            dashed: false,
-            underline: false,
-            overline: false,
-            superscript: false,
-            subscript: false,
-            size: "11pt",
-            color: 'black',
-            bgcolor: false
-        },
-        paragraph: {
-            align: "left",
-            linesHeight: "0.5cm",
-            firstLineIndentation: false
-        }
+        marginTop: "2.5cm",
+        marginBottom: "2.5cm",
+        marginLeft: "3cm",
+        marginRight: "3cm",
+        fontFamily: 'calibri',
+        fontBold: false,
+        fontItalic: false,
+        fontDashed: false,
+        fontUnderline: false,
+        fontOverline: false,
+        fontSuperscript: false,
+        fontSubscript: false,
+        fontSize: "11pt",
+        fontColor: 'black',
+        fontBgcolor: false,
+        paragraphAlign: "right",
+        paragraphLinesHeight: "0.5cm",
+        paragraphFirstLineIndentation: false
     },
     pdfHtmlContent: null,
     pdfStyleContent: null,
     mounting: false,
-    spans: 0,
-    pages: 1, 
+    totalSpans: 0,
+    totalPages: 1,
+    pageSelected: 1, 
     startMount(){
         const styleObject = module.exports.style;
         module.exports.pdfHtmlContent = (
@@ -47,18 +45,19 @@ module.exports = {
                 '<body>' +
                     '<div class="page" id="page1">'
         );
-        module.exports.pdfStyleContent = (
+        module.exports.pdfStyleContent = RESET_CSS + (
             '.page{' +
-                `padding: ${styleObject.padding.top} ${styleObject.padding.right} ${styleObject.padding.bottom} ${styleObject.padding.left};` +
+                `padding: ${convertToPixels(styleObject.marginTop)}px ${convertToPixels(styleObject.marginRight)}px ${convertToPixels(styleObject.marginBottom)}px ${convertToPixels(styleObject.marginLeft)}px;` +
                 'overflow-wrap: anywhere;' +
-                `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.padding.top) + convertToPixels(styleObject.padding.bottom))}px;` +
+                `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.marginTop) + convertToPixels(styleObject.marginBottom))}px;` +
             '}'
         )
         module.exports.mounting = true;
-        module.exports.spans = 0;
-        module.exports.pages = 1;
+        module.exports.totalSpans = 0;
+        module.exports.totalPages = 1;
     },
     async finishMount(){
+        
         module.exports.pdfHtmlContent += (
                     "</div>" +
                 "</body>" +
@@ -88,7 +87,7 @@ module.exports = {
         let currentPageHeight = await getPageHeight(styleObject, textMessage, testPage);
         if (currentPageHeight > PAGE_DEFAULT_HEIGHT){
 
-            const waitingMessage = await discordChannel.send("Hold on, this might take a while...");
+            const waitingMessage = await discordChannel.send("Hold on, this process can take several minutes...");
 
             let currentHeightIsHigher = true;
             let nextPageNeedsBreak = true;
@@ -110,14 +109,13 @@ module.exports = {
                     spanContent = mountSpan(styleObject, previousPageText.join(''));
                     currentPageHeight = await getPageHeight(styleObject, spanContent, testPage);
                     if(currentPageHeight <= PAGE_DEFAULT_HEIGHT){
-                        module.exports.spans++;
+                        module.exports.totalSpans++;
                         spanContent = mountSpan(styleObject, previousPageText.join(''));
                         module.exports.pdfStyleContent += addSpanStyle(styleObject);
-                        module.exports.pages++;
-                        module.exports.pdfHtmlContent += spanContent + `</div><div class="page" id="page${module.exports.pages}">`;
+                        module.exports.totalPages++;
+                        module.exports.pdfHtmlContent += spanContent + `</div><div class="page" id="page${module.exports.totalPages}">`;
                         currentHeightIsHigher = false;
                     }
-                    console.log(previousPageText.length, nextPageContent.length);
                 }
                 spanContent = mountSpan(styleObject, nextPageContent.join(''));
                 currentPageHeight = await getPageHeight(styleObject,spanContent, testPage);
@@ -127,7 +125,7 @@ module.exports = {
                     nextPageContent = [];
                 }
                 else{
-                    module.exports.spans++;
+                    module.exports.totalSpans++;
                     spanContent = mountSpan(styleObject, nextPageContent.join(''));
                     nextPageNeedsBreak = false;
                 }
@@ -139,16 +137,17 @@ module.exports = {
             }catch{}
         }
         else{  
-            module.exports.spans++;    
+            module.exports.totalSpans++;    
             spanContent = mountSpan(styleObject, textMessage);
         }
 
         // Adds the rest of the content
         module.exports.pdfStyleContent += addSpanStyle(styleObject);
         module.exports.pdfHtmlContent += spanContent;
+        module.exports.selectPage(module.exports.totalPages);
         
     },
-    async getPreviewPages(){
+    async getPreviewPage(){
         const { browser } = require(`.${path.sep}browser`);
         const previewPdf = await browser.newPage();
         await previewPdf.setContent(module.exports.pdfHtmlContent + 
@@ -156,39 +155,49 @@ module.exports = {
                 "</body>" +
             "</html>");
         await previewPdf.addStyleTag({content: module.exports.pdfStyleContent});
-        const pagesArray = await previewPdf.$$(".page");
-        return pagesArray;
-    }
+        const pageElement = await previewPdf.$(`#page${module.exports.pageSelected}`);
+        pagePreview = await pageElement.screenshot();
+        return pagePreview;
+    },
+    selectPage(pageNumber){
+        module.exports.pageSelected = pageNumber;
+    },
 }
 
 // Other functions
 function addSpanStyle(styleObject){
     let styleString = (
-        `#span${module.exports.spans}{` +
-            'display: table;' +
-            `font-family: ${styleObject.font.family}; ` +
-            `font-weight: ${styleObject.font.bold ? "bold; " : "normal; "}` +
-            `${styleObject.font.italic ? "font-style: italic; " : ""}`
+        `#span${module.exports.totalSpans}{` +
+            'display: flex;' +
+            `font-family: ${styleObject.fontFamily}; ` +
+            `font-weight: ${styleObject.fontBold ? "bold; " : "normal; "}` +
+            `${styleObject.fontItalic ? "font-style: italic; " : ""}`
     );
-    if(styleObject.font.dashed || styleObject.font.underline || styleObject.font.overline){
+    if(styleObject.fontDashed || styleObject.fontUnderline || styleObject.fontOverline){
         styleString += "text-decoration:";
-        if(styleObject.font.dashed){
-            styleString += ` line-through${styleObject.font.dashed == "double" ? " double; " : "; "}`;
+        if(styleObject.fontDashed){
+            styleString += ` line-through${styleObject.fontDashed == "double" ? " double; " : "; "}`;
         }
         else{
             styleString += (
-                (styleObject.font.underline ? " underline" : "") +
-                (styleObject.font.overline ? " overline" : "") + "; "
+                (styleObject.fontUnderline ? " underline" : "") +
+                (styleObject.fontOverline ? " overline" : "") + "; "
             );
         }
     }
     styleString += (
-            `font-size: ${styleObject.font.size}; ` +
-            `color: ${styleObject.font.color}; ` +
-            (styleObject.font.bgcolor ? `background-color: ${styleObject.font.bgcolor}; ` : "") +
-            `text-align: ${styleObject.paragraph.align}; ` +
-            `line-height: ${styleObject.paragraph.linesHeight}; ` +
-            `${styleObject.paragraph.firstLineIndentation ? `text-indent: ${styleObject.paragraph.firstLineIndentation};` : ""}` +
+            `font-size: ${styleObject.fontSize}; ` +
+            `color: ${styleObject.fontColor}; ` +
+            (styleObject.fontBgcolor ? `background-color: ${styleObject.fontBgcolor}; ` : "") +
+            `text-align: ${styleObject.paragraphAlign}; `
+    );
+
+    if(styleObject.paragraphAlign == "right" || styleObject.paragraphAlign == "center"){
+        styleString += "justify-content: " + (styleObject.paragraphAlign == "right" ? "flex-end; " : "center; ");
+    }
+    styleString += (
+            `line-height: ${styleObject.paragraphLinesHeight}; ` +
+            `${styleObject.paragraphFirstLineIndentation ? `text-indent: ${styleObject.paragraphFirstLineIndentation};` : ""}` +
         '}'
     );
     return styleString;
@@ -196,11 +205,11 @@ function addSpanStyle(styleObject){
 
 function mountSpan(styleObject, text){
     let mountedSpan = '';
-    if (styleObject.font.superscript) mountedSpan += "<sup>";
-    if (styleObject.font.subscript) mountedSpan += "<sub>";
-    mountedSpan = `<span id="span${module.exports.spans}">${text}</span>`;
-    if (styleObject.font.superscript) mountedSpan += "</sup>";
-    if (styleObject.font.subscript) mountedSpan += "</sub>";
+    if (styleObject.fontSuperscript) mountedSpan += "<sup>";
+    if (styleObject.fontSubscript) mountedSpan += "<sub>";
+    mountedSpan = `<span id="span${module.exports.totalSpans}">${text}</span>`;
+    if (styleObject.fontSuperscript) mountedSpan += "</sup>";
+    if (styleObject.fontSubscript) mountedSpan += "</sub>";
     return mountedSpan;
 }
 
@@ -212,7 +221,7 @@ async function getPageHeight(styleObject, textMessage, testPage){
         "</html>"
     );
     await testPage.addStyleTag({content: module.exports.pdfStyleContent});
-    return await testPage.$eval(`#span${module.exports.spans}`, spanContent => spanContent.closest(".page").clientHeight);
+    return await testPage.$eval(`#page${module.exports.totalPages}`, page => page.getBoundingClientRect().height);
 }
 
 function groupHtmlElements(elementType, text){
@@ -261,5 +270,5 @@ function convertToPixels(value){
             break;
     }
 
-    return Math.round(numericalValue * conversionFactor * 10) / 10;
+    return Math.floor(numericalValue * conversionFactor * 100) / 100;
 }

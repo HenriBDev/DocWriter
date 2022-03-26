@@ -10,25 +10,27 @@ module.exports = {
 	},
 	execute(messageSent){
 		const currentChannel = messageSent.channel;
-		const { client } = require(`..${path.sep}instances${path.sep}client`)
-		let helpString = "**Available commands:**\n\n**pdf|help** -> Show all available commands for PDFMaker";
+		return currentChannel.send(module.exports.helpString);
+	},
+	helpString: "",
+	setHelpString(client){
+		module.exports.helpString = "**Available commands:**\n\n**pdf|help** -> Show all available commands for PDFMaker";
 		client.commands.forEach(command => {
 		    if(command.data.name !== "help"){
 			
 				//**pdf|<comand_name>** ...`<command_params>` -> <command_description>
 			
 				// Command name
-		        helpString += "\n\n**pdf|" + command.data.name + "** "; 
+		        module.exports.helpString += "\n\n**pdf|" + command.data.name + "** "; 
 			
 				// Command parameters
 				command.data.params.forEach(param => {
-					helpString += param ? "\`" + param + "\` " : "";
+					module.exports.helpString += param ? "\`" + param + "\` " : "";
 				});
 			
 				// Command description
-				helpString += "-> " + command.data.description;
+				module.exports.helpString += "-> " + command.data.description;
 		    }
 		})
-		return currentChannel.send(helpString);
 	}
 };

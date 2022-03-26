@@ -1,8 +1,14 @@
 // Node modules
 const path = require('path');
 
+// Discord.js' select menu
+const { MessageSelectMenu } = require('discord.js');
+
 // Filename sanitizer
 const sanitize = require('sanitize-filename');
+
+// pdfStyle functions
+const { startMount, addContent, getPreviewPage, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 
 // Event
 module.exports = {
@@ -41,22 +47,60 @@ module.exports = {
 		}
 
 		senderLastMessage = senderMessages.at(1).content;
-		const { startMount, addContent, getPreviewPages, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		startMount();
 		await addContent(senderLastMessage, currentChannel);
+		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		const docFinished = await finishMount();
 		let pdfFile;
-		pdfFile = await docFinished.pdf({format: "A4"});
-		let previewFiles = await getPreviewPages();
-		previewFiles = await Promise.all(previewFiles.map(async (page, index) => ({
-			name: `preview${index}.png`, 
-			attachment: await page.screenshot()
-		})));
-		return await currentChannel.send({files: previewFiles.concat([
+		pdfFile = await docFinished.pdf({format: "A4", pageRanges: `1-${totalPages}`});
+		let previewFile = await getPreviewPage();
+
+		// Creates select menu
+		const pageSelectMenu = new MessageSelectMenu({
+			customId: "select_menu"
+		});
+		for(let page = 1; page <= totalPages; page++){
+			pageSelectMenu.addOptions({
+				label: `Page ${page}/${totalPages}`,
+				value: `${page}`,
+				default: page == totalPages ? true : false
+			});
+		}
+
+		// Responds command
+		await currentChannel.send({files:[
 			{
 				name: fileName + ".pdf", 
 				attachment: pdfFile
 			}
-		])});
+		]});
+		return await currentChannel.send(
+			{
+				content: "Pages preview:", 
+				files: [{
+					name: "preview.png",
+					attachment: previewFile
+				}],
+				components: [{
+					type: 1,
+					components: [{
+						type: 2,
+						label: "◀️",
+						customId: "backward_button",
+						style: "PRIMARY"
+					},
+					{
+						type: 2,
+						label: "▶️",
+						customId: "forward_button",
+						style: "PRIMARY"
+					}]
+				},
+				{
+					type: 1,
+					components: [pageSelectMenu]
+				}]	
+			}
+		);
 	}
 };

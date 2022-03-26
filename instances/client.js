@@ -23,6 +23,9 @@ module.exports = {
         createHandler('commands');
         createHandler('events');
 
+        // Writes the help command
+        require(`..${path.sep}commands${path.sep}help`).setHelpString(module.exports.client);
+
         return module.exports.client;
     }
 }
