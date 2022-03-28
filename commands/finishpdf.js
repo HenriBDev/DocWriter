@@ -5,7 +5,7 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // pdfStyle functions
-const { finishMount, getPreviewPage } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 
 
 // Filename sanitizer
@@ -18,11 +18,10 @@ module.exports = {
         params: ['<file_name>'],
         description: "Finishes mounting the document and export it as PDF"
     },
-    async execute(messageSent){
+    async execute(messageSent, parameters){
 
 		const currentChannel = messageSent.channel;
-        const messageSplit = messageSent.content.split(' ')
-		let fileName = messageSplit[1];
+		let fileName = parameters[0];
 
 		if(!fileName){
 			// User didn't specify a name for the file
@@ -34,7 +33,6 @@ module.exports = {
 		const docFinished = await finishMount();
 		let pdfFile;
 		pdfFile = await docFinished.pdf({format: "A4", pageRanges: `1-${totalPages}`});
-		let previewFile = await getPreviewPage();
 
 		// Creates select menu
 		const pageSelectMenu = new MessageSelectMenu({

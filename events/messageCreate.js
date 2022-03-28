@@ -9,48 +9,60 @@ const { PREFIX, toggleCommandExecution } = require(clientPath);
 module.exports = {
     eventType: "on",
     name: 'messageCreate',
-    execute(message){
+    async execute(message){
 
-        // Check if the message is a bot command (has prefix)
-        if (!isCommand(message)) return 
+        // Check if the message isn't a bot command (has prefix)
+        if (isNotCommand(message.content)) return 
 
         // Check if there is another command in execution
         const { executingCommand } = require(clientPath);
         if (executingCommand) return
 
         const { client } = require(clientPath);
+        let commandsArray = [];
+        let parametersArray = [];
+        let parameters;
         let command;
-        try{
+        let showHelp = false;
+        
 
-            // Checks if command exists
-            command = getCommand(client, message);
-            if (!command){
-                throw false;
-            }
+        // Checks if message contains multiple commands
+        let commandsSeparated = message.content.split('|');
+        for(let messageIndex = 1; messageIndex < commandsSeparated.length; messageIndex++){
             
+            // Checks if command exists
+            command = getCommand(client, commandsSeparated[messageIndex]);
+            parameters = getParameters(commandsSeparated[messageIndex]);
+            if (!command){
+                if(showHelp == false){
+                    showHelp = true;
+                }
+            }
+            else{
+                commandsArray.push(command);
+                parametersArray.push(parameters)
+            }
         }
-        catch{
 
-            // Shows help if user types wrong command with the prefix
-            command = client.commands.get('help');
-
+        if(showHelp){
+            commandsArray.push(client.commands.get('help'));
         }
+        
         try {
 
-            // Responds command
+            // Responds command(s)
             toggleCommandExecution();
-            command.execute(message).then(async () => {
 
-                // Tries to delete the message if it's still there
-                try{
-                    await message.delete();
-                }catch{}
-
-                // Finishes command execution
-                toggleCommandExecution();
-                console.log(`[${new Date().toTimeString()}] Command finished execution.`);
-
-            });
+            for(let commandIndex = 0; commandIndex < commandsArray.length; commandIndex++){
+                await commandsArray[commandIndex].execute(message, parametersArray[commandIndex]);
+            }
+            try{
+                await message.delete();
+            }catch{}
+    
+            // Finishes command(s) execution
+            toggleCommandExecution();
+            console.log(`[${new Date().toTimeString()}] Command(s) finished execution.`);
 
         } catch (error) {
             console.error(error);
@@ -59,10 +71,19 @@ module.exports = {
 }
 
 // Other functions
-function isCommand(message){
-	return message.content.startsWith(PREFIX);
+function isNotCommand(message){
+	return !message.startsWith(PREFIX);
 }
 
 function getCommand(client, message){
-	return client.commands.get(message.content.split(PREFIX)[1].split(' ')[0]);
+	return client.commands.get(message.split(' ')[0]);
+}
+
+function getParameters(command){
+    if(command.split(' ').length > 1){
+        return command.split(' ').splice(1);
+    }
+    else{
+        return null;
+    }
 }

@@ -7,7 +7,7 @@ module.exports = {
         params: [null],
         description: "Adds last message to the PDF without finishing the mounting"
     },
-    async execute(messageSent){
+    async execute(messageSent, parameters = null){
         const senderId = messageSent.author.id;
 		const currentChannel = messageSent.channel;
 		let senderMessages, senderLastMessage;

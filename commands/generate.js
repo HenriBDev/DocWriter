@@ -17,11 +17,10 @@ module.exports = {
 		params: ['<file_name>'],
 		description: "Generates a PDF file using the user's last text message"
 	},
-	async execute(messageSent){
+	async execute(messageSent, parameters){
 		
 		const currentChannel = messageSent.channel;
-		const messageSplit = messageSent.content.split(' ')
-		let fileName = messageSplit[1];
+		let fileName = parameters[0];
 
 		if(!fileName){
 			// User didn't specify a name for the file

@@ -27,7 +27,7 @@ module.exports = {
         fontSize: "11pt",
         fontColor: 'black',
         fontBgcolor: false,
-        paragraphAlign: "right",
+        paragraphAlign: "left",
         paragraphLinesHeight: "0.5cm",
         paragraphFirstLineIndentation: false
     },

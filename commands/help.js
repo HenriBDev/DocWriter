@@ -1,6 +1,3 @@
-// Node modules
-const path = require('path');
-
 // Event
 module.exports = {
 	data: {
@@ -8,17 +5,21 @@ module.exports = {
         params: [null],
 		description: "Show all available commands for PDFMaker"
 	},
-	execute(messageSent){
+	execute(messageSent, parameters = null){
 		const currentChannel = messageSent.channel;
 		return currentChannel.send(module.exports.helpString);
 	},
 	helpString: "",
 	setHelpString(client){
-		module.exports.helpString = "**Available commands:**\n\n**pdf|help** -> Show all available commands for PDFMaker";
+		module.exports.helpString = "**Available commands:**\n" +
+									"(You can chain commands using `|`)\n" +
+									"For example: `pdf|addcontent|finishpdf myPdfFile`\n" +
+									"\n" +
+									"**pdf|help** -> Show all available commands for PDFMaker";
 		client.commands.forEach(command => {
 		    if(command.data.name !== "help"){
 			
-				//**pdf|<comand_name>** ...`<command_params>` -> <command_description>
+				//**pdf|<command_name>** ...`<command_params>` -> <command_description>
 			
 				// Command name
 		        module.exports.helpString += "\n\n**pdf|" + command.data.name + "** "; 
