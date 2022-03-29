@@ -11,7 +11,7 @@ const { selectPage } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
 
 // Client interaction execution toogle
-const { toggleInteractionExecution } = require(`..${path.sep}instances${path.sep}client`);
+const { toggleCommandExecution } = require(`..${path.sep}instances${path.sep}client`);
 
 // Event
 module.exports = {
@@ -22,9 +22,9 @@ module.exports = {
         // Delays interaction answer to prevent the "This interaction failed" error
         interaction.deferUpdate();
 
-        // Check if there is another interaction in execution
-        const { executingInteraction } = require(`..${path.sep}instances${path.sep}client`);
-        if (executingInteraction) return
+        // Check if there is another command/interaction in execution
+        const { executingCommand } = require(`..${path.sep}instances${path.sep}client`);
+        if (executingCommand) return
 
         // Checks if interaction is with a button or the select menu
         if(!interaction.isButton() && !interaction.isSelectMenu()){
@@ -32,7 +32,7 @@ module.exports = {
         }
         else{
 
-            toggleInteractionExecution();
+            toggleCommandExecution();
 
             let interactionMessage, newPageSelection, messageOptions = {};
 
@@ -101,7 +101,7 @@ module.exports = {
                 attachment: previewFile
             }];
             interactionMessage.edit(messageOptions);
-            toggleInteractionExecution();
+            toggleCommandExecution();
             console.log(`[${new Date().toTimeString()}] interaction finished execution.`);
         }
     }

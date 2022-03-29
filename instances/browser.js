@@ -29,5 +29,19 @@ module.exports = {
     async mountDocument(htmlContent, styleContent){
         await module.exports.document.setContent(htmlContent + "</div></body></html>");
         await module.exports.document.addStyleTag({content: styleContent});
+    },
+
+    async getStyleProperty(property, spanId){
+        return await module.exports.document.$eval(`#span${spanId}`, (testText, property) => {
+            let propertyValue = window.getComputedStyle(testText).getPropertyValue(property);
+            if(property == "font-family"){
+                let fontSize = window.getComputedStyle(testText).getPropertyValue("font-size");
+                if(!document.fonts.check(`${fontSize} ${propertyValue}`)){
+                    propertyValue = "Times New Roman";
+                    testText.style['font-family'] = propertyValue;
+                }
+            }
+            return propertyValue;
+        }, property);
     }
 }

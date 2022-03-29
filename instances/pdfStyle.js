@@ -3,6 +3,7 @@ const path = require('path');
 
 // Text Parser
 const { toHTML } = require('discord-markdown');
+const { getStyleProperty } = require('./browser');
 
 // Browser interactions
 const { getPageHeight, getPdfFile, mountDocument } = require(`.${path.sep}browser`);
@@ -34,6 +35,22 @@ module.exports = {
         paragraphAlign: "left",
         paragraphLinesHeight: "0.5cm",
         paragraphFirstLineIndentation: false
+    },
+
+    async setStyleProperty(property, value){
+        module.exports.style[property] = value;
+
+        // If it's an invalid font family, sets it to "Times New Roman"
+        if(property == "fontFamily"){
+            await mountDocument(module.exports.pdfHtmlContent + '<span id="spanTest">test</span>', 
+                "#spanTest{" +
+                    `font-family: ${value};` +
+                "}"
+            );
+            module.exports.style[property] = await getStyleProperty("font-family", "Test");
+        }
+        
+        return module.exports.style[property];
     },
 
     pdfHtmlContent: null,
@@ -159,7 +176,7 @@ module.exports = {
         module.exports.pdfHtmlContent = pdfHtmlContent;
         module.exports.totalSpans = totalSpans;
         module.exports.selectPage(totalPages);
-        mountDocument(pdfHtmlContent, pdfStyleContent);
+        await mountDocument(pdfHtmlContent, pdfStyleContent);
         
     },
 
@@ -169,10 +186,10 @@ module.exports = {
 }
 
 // Other functions
-function mountSpanStyle(styleObject, totalSpans){
+function mountSpanStyle(styleObject, spanId){
 
     let styleString = (
-        `#span${totalSpans}{` +
+        `#span${spanId}{` +
             'display: flex;' +
             `font-family: ${styleObject.fontFamily}; ` +
             `font-weight: ${styleObject.fontBold ? "bold; " : "normal; "}` +
@@ -208,12 +225,12 @@ function mountSpanStyle(styleObject, totalSpans){
     return styleString;
 }
 
-function mountSpan(styleObject, spanText, totalSpans){
+function mountSpan(styleObject, spanText, spanId){
 
     let mountedSpan = '';
     if (styleObject.fontSuperscript) mountedSpan += "<sup>";
     if (styleObject.fontSubscript) mountedSpan += "<sub>";
-    mountedSpan = `<span id="span${totalSpans}">${spanText}</span>`;
+    mountedSpan = `<span id="span${spanId}">${spanText}</span>`;
     if (styleObject.fontSuperscript) mountedSpan += "</sup>";
     if (styleObject.fontSubscript) mountedSpan += "</sub>";
 
