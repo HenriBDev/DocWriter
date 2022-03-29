@@ -1,5 +1,14 @@
+// Node modules
 const path = require('path');
+
+// Discord.js' select menu
 const { MessageSelectMenu } = require('discord.js');
+
+// pdfStyle methods
+const { startMount, addContent } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+
+// Browser interactions
+const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
     data: {
@@ -8,11 +17,13 @@ module.exports = {
         description: "Adds last message to the PDF without finishing the mounting"
     },
     async execute(messageSent, parameters = null){
-        const senderId = messageSent.author.id;
-		const currentChannel = messageSent.channel;
+
 		let senderMessages, senderLastMessage;
 
-		// Filters the user's messages
+		// Gets the discord message's data
+        const senderId = messageSent.author.id, currentChannel = messageSent.channel;
+
+		// Filters the sender's messages
 		await currentChannel.messages.fetch()
 			.then(channelMessages => {
 				senderMessages = channelMessages.filter(message => message.author.id === senderId ? true : false);
@@ -20,20 +31,20 @@ module.exports = {
 
 		// Filters no-text messages
 		await senderMessages.filter(message => message.content);
-
 		if(senderMessages.size <= 1){
 			// User didn't send any text messages before command
 			return currentChannel.send("No text messages available.");
 		}
 
-		// Adds text to document
-		senderLastMessage = senderMessages.at(1).content;
-        const { mounting, startMount, addContent, getPreviewPage } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		// Checks if a document is already in the making
+		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
+
+		// Adds text to document
+		senderLastMessage = senderMessages.at(1).content;
 		await addContent(senderLastMessage, currentChannel);
-		let previewFile = await getPreviewPage();
 
 		// Creates select menu
 		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
@@ -48,7 +59,8 @@ module.exports = {
 			});
 		}
 
-		// Responds command
+		// Creates file preview and responds command
+		const previewFile = await getPagePreview(totalPages);
 		return await currentChannel.send(
 			{
 				content: "Pages preview:", 

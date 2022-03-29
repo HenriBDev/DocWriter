@@ -4,13 +4,17 @@ const path = require('path');
 // Text Parser
 const { toHTML } = require('discord-markdown');
 
+// Browser interactions
+const { getPageHeight, getPdfFile, mountDocument } = require(`.${path.sep}browser`);
+
 // Page (A4 paper) height in pixels (96 dpi)
 const PAGE_DEFAULT_HEIGHT = 1122.5;
 
 // Reset CSS string
-const RESET_CSS = "/* http://meyerweb.com/eric/tools/css/reset/ v2.0 | 20110126License: none (public domain)*/html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, em, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body {line-height: 1;}ol, ul {list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after,q:before, q:after {content: '';content: none;}table {border-collapse: collapse;border-spacing: 0;}";
+const RESET_CSS = "/* http://meyerweb.com/eric/tools/css/reset/ v2.0 (public domain)*/html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, em, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body {line-height: 1;}ol, ul {list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after,q:before, q:after {content: '';content: none;}table {border-collapse: collapse;border-spacing: 0;}";
 
 module.exports = {
+
     style: {
         marginTop: "2.5cm",
         marginBottom: "2.5cm",
@@ -31,13 +35,16 @@ module.exports = {
         paragraphLinesHeight: "0.5cm",
         paragraphFirstLineIndentation: false
     },
+
     pdfHtmlContent: null,
     pdfStyleContent: null,
     mounting: false,
     totalSpans: 0,
     totalPages: 1,
     pageSelected: 1, 
+
     startMount(){
+
         const styleObject = module.exports.style;
         module.exports.pdfHtmlContent = (
             '<!DOCTYPE html>' +
@@ -55,81 +62,86 @@ module.exports = {
         module.exports.mounting = true;
         module.exports.totalSpans = 0;
         module.exports.totalPages = 1;
+
     },
+
     async finishMount(){
-        
-        module.exports.pdfHtmlContent += (
-                    "</div>" +
-                "</body>" +
-            "</html>"
-        );
-        const { browser } = require(`.${path.sep}browser`);
-        const finishedFile = await browser.newPage();
-        await finishedFile.setContent(module.exports.pdfHtmlContent);
-        await finishedFile.addStyleTag({content: module.exports.pdfStyleContent});
+
         module.exports.mounting = false;
-        return finishedFile;
+        return await getPdfFile(module.exports.pdfHtmlContent, module.exports.pdfStyleContent, module.exports.totalPages);
+
     },
+
     async addContent(textMessage, discordChannel){
 
         // Parses Discord's Markdown and HTML entities
         textMessage = toHTML(textMessage);
 
-        // Adds new span
-        let spanContent;
-
-        // Adds style of the content
+        // Gets module properties for better reading
         const styleObject = module.exports.style;
+        let pdfHtmlContent = module.exports.pdfHtmlContent, 
+            pdfStyleContent = module.exports.pdfStyleContent, 
+            totalSpans = module.exports.totalSpans,
+            totalPages = module.exports.totalPages;
+
+        // Gets page height
+        let currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, textMessage, totalSpans), 
+                                                    pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
+                                                    totalPages);
 
         // Breaks pages if needed
-        const { browser } = require(`.${path.sep}browser`);
-        const testPage = await browser.newPage();
-        let currentPageHeight = await getPageHeight(styleObject, textMessage, testPage);
         if (currentPageHeight > PAGE_DEFAULT_HEIGHT){
 
+            // Warns user that this process may be slow
             const waitingMessage = await discordChannel.send("Hold on, this process can take several minutes...");
 
-            let currentHeightIsHigher = true;
-            let nextPageNeedsBreak = true;
-            let nextPageContent = [];
-            let previousPageText = textMessage.split('');
+            let nextPageNeedsBreak = true, currentPageContent = textMessage.split(''), nextPageContent = [], nextPageHeight;
 
-            let htmlTagsExist = !!previousPageText.find(value => value == "<");
+            // Groups HTML tags and entities in single elements of the array
+            let htmlTagsExist = !!currentPageContent.find(value => value == "<");
             if(htmlTagsExist){
-                previousPageText = groupHtmlElements("tags", previousPageText);
+                currentPageContent = groupHtmlElements("tags", currentPageContent);
             }
-            let htmlEntitiesExist = !!previousPageText.find(value => value == "&");
+            let htmlEntitiesExist = !!currentPageContent.find(value => value == "&");
             if(htmlEntitiesExist){
-                previousPageText = groupHtmlElements("entities", previousPageText);
+                currentPageContent = groupHtmlElements("entities", currentPageContent);
             }
 
+            // Breaks text into pages
             while(nextPageNeedsBreak){
-                while(currentHeightIsHigher){
-                    nextPageContent.unshift(previousPageText.pop());
-                    spanContent = mountSpan(styleObject, previousPageText.join(''));
-                    currentPageHeight = await getPageHeight(styleObject, spanContent, testPage);
+
+                // Breaks current page
+                while(currentPageHeight > PAGE_DEFAULT_HEIGHT){
+                    nextPageContent.unshift(currentPageContent.pop());
+                    currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, currentPageContent.join(''), totalSpans), 
+                                                            pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
+                                                            totalPages);
                     if(currentPageHeight <= PAGE_DEFAULT_HEIGHT){
-                        module.exports.totalSpans++;
-                        spanContent = mountSpan(styleObject, previousPageText.join(''));
-                        module.exports.pdfStyleContent += addSpanStyle(styleObject);
-                        module.exports.totalPages++;
-                        module.exports.pdfHtmlContent += spanContent + `</div><div class="page" id="page${module.exports.totalPages}">`;
-                        currentHeightIsHigher = false;
+                        totalSpans++;
+                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
+                        totalPages++;
+                        pdfHtmlContent += mountSpan(styleObject, currentPageContent.join(''), totalSpans) + `</div><div class="page" id="page${totalPages}">`;
                     }
                 }
-                spanContent = mountSpan(styleObject, nextPageContent.join(''));
-                currentPageHeight = await getPageHeight(styleObject,spanContent, testPage);
-                if(currentPageHeight > PAGE_DEFAULT_HEIGHT){
-                    currentHeightIsHigher = true;
-                    previousPageText = nextPageContent;
+
+                // Checks if next page needs break and loops back in case it does
+                nextPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, nextPageContent.join(''), totalSpans), 
+                                                     pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
+                                                     totalPages);
+                if(nextPageHeight > PAGE_DEFAULT_HEIGHT){
+                    currentPageContent = nextPageContent;
                     nextPageContent = [];
                 }
                 else{
-                    module.exports.totalSpans++;
-                    spanContent = mountSpan(styleObject, nextPageContent.join(''));
+                    totalSpans++;
+                    pdfHtmlContent += mountSpan(styleObject, nextPageContent.join(''), totalSpans);
+                    pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
                     nextPageNeedsBreak = false;
                 }
             }
+
+            // Updates number of pages
+            module.exports.totalPages = totalPages;
 
             // Tries to delete the waiting message if it's still there
             try{
@@ -137,37 +149,30 @@ module.exports = {
             }catch{}
         }
         else{  
-            module.exports.totalSpans++;    
-            spanContent = mountSpan(styleObject, textMessage);
+            totalSpans++;    
+            pdfHtmlContent += mountSpan(styleObject, textMessage, totalSpans);
+            pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
         }
 
-        // Adds the rest of the content
-        module.exports.pdfStyleContent += addSpanStyle(styleObject);
-        module.exports.pdfHtmlContent += spanContent;
-        module.exports.selectPage(module.exports.totalPages);
+        // Updates the rest of the module and the document
+        module.exports.pdfStyleContent = pdfStyleContent;
+        module.exports.pdfHtmlContent = pdfHtmlContent;
+        module.exports.totalSpans = totalSpans;
+        module.exports.selectPage(totalPages);
+        mountDocument(pdfHtmlContent, pdfStyleContent);
         
     },
-    async getPreviewPage(){
-        const { browser } = require(`.${path.sep}browser`);
-        const previewPdf = await browser.newPage();
-        await previewPdf.setContent(module.exports.pdfHtmlContent + 
-                    "</div>" +
-                "</body>" +
-            "</html>");
-        await previewPdf.addStyleTag({content: module.exports.pdfStyleContent});
-        const pageElement = await previewPdf.$(`#page${module.exports.pageSelected}`);
-        pagePreview = await pageElement.screenshot();
-        return pagePreview;
-    },
+
     selectPage(pageNumber){
         module.exports.pageSelected = pageNumber;
     },
 }
 
 // Other functions
-function addSpanStyle(styleObject){
+function mountSpanStyle(styleObject, totalSpans){
+
     let styleString = (
-        `#span${module.exports.totalSpans}{` +
+        `#span${totalSpans}{` +
             'display: flex;' +
             `font-family: ${styleObject.fontFamily}; ` +
             `font-weight: ${styleObject.fontBold ? "bold; " : "normal; "}` +
@@ -203,25 +208,16 @@ function addSpanStyle(styleObject){
     return styleString;
 }
 
-function mountSpan(styleObject, text){
+function mountSpan(styleObject, spanText, totalSpans){
+
     let mountedSpan = '';
     if (styleObject.fontSuperscript) mountedSpan += "<sup>";
     if (styleObject.fontSubscript) mountedSpan += "<sub>";
-    mountedSpan = `<span id="span${module.exports.totalSpans}">${text}</span>`;
+    mountedSpan = `<span id="span${totalSpans}">${spanText}</span>`;
     if (styleObject.fontSuperscript) mountedSpan += "</sup>";
     if (styleObject.fontSubscript) mountedSpan += "</sub>";
-    return mountedSpan;
-}
 
-async function getPageHeight(styleObject, textMessage, testPage){
-    let mountedSpan = mountSpan(styleObject, textMessage);
-    await testPage.setContent(module.exports.pdfHtmlContent + mountedSpan +
-                "</div>" +
-            "</body>" +
-        "</html>"
-    );
-    await testPage.addStyleTag({content: module.exports.pdfStyleContent});
-    return await testPage.$eval(`#page${module.exports.totalPages}`, page => page.getBoundingClientRect().height);
+    return mountedSpan;
 }
 
 function groupHtmlElements(elementType, text){

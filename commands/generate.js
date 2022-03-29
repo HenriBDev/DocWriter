@@ -7,8 +7,11 @@ const { MessageSelectMenu } = require('discord.js');
 // Filename sanitizer
 const sanitize = require('sanitize-filename');
 
-// pdfStyle functions
-const { startMount, addContent, getPreviewPage, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+// pdfStyle methods
+const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+
+// Browser interactions
+const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`)
 
 // Event
 module.exports = {
@@ -19,17 +22,18 @@ module.exports = {
 	},
 	async execute(messageSent, parameters){
 		
-		const currentChannel = messageSent.channel;
+		let senderMessages, senderLastMessage;
+
+		// Gets the discord message's data
+		const currentChannel = messageSent.channel, senderId = messageSent.author.id;
 		let fileName = parameters[0];
 
+		// Validates the name of the file
 		if(!fileName){
 			// User didn't specify a name for the file
 			return await currentChannel.send("Please choose a name for the file!");
 		}
-
 		fileName = sanitize(fileName)
-		const senderId = messageSent.author.id;
-		let senderMessages, senderLastMessage;
 
 		// Filters the user's messages
 		await currentChannel.messages.fetch()
@@ -39,20 +43,16 @@ module.exports = {
 
 		// Filters no-text messages
 		await senderMessages.filter(message => message.content);
-
 		if(senderMessages.size <= 1){
 			// User didn't send any text messages before command
 			return currentChannel.send("No text messages available.");
 		}
 
+		// Mounts document with the sent message
 		senderLastMessage = senderMessages.at(1).content;
 		startMount();
 		await addContent(senderLastMessage, currentChannel);
 		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
-		const docFinished = await finishMount();
-		let pdfFile;
-		pdfFile = await docFinished.pdf({format: "A4", pageRanges: `1-${totalPages}`});
-		let previewFile = await getPreviewPage();
 
 		// Creates select menu
 		const pageSelectMenu = new MessageSelectMenu({
@@ -66,7 +66,9 @@ module.exports = {
 			});
 		}
 
-		// Responds command
+		// Creates PDF and preview files and responds command
+		const pdfFile = await finishMount();
+		const previewFile = await getPagePreview(totalPages);
 		await currentChannel.send({files:[
 			{
 				name: fileName + ".pdf", 

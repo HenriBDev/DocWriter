@@ -11,11 +11,21 @@ const { Client, Intents, Collection } = require('discord.js');
 
 // Instance
 module.exports = {
+    
     client: null,
     executingCommand: false,
-    toggleCommandExecution(){module.exports.executingCommand = !module.exports.executingCommand},
+    executingInteraction: false,
     BOT_TOKEN: process.env.BOT_TOKEN,
     PREFIX: "pdf|",
+
+    toggleCommandExecution(){
+        module.exports.executingCommand = !module.exports.executingCommand
+    },
+
+    toggleInteractionExecution(){
+        module.exports.executingInteraction = !module.exports.executingInteraction
+    },
+
     instantiateClient(){
         module.exports.client = new Client({ intents: [Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS] });
 
