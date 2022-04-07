@@ -31,7 +31,7 @@ module.exports = {
         await module.exports.document.addStyleTag({content: styleContent});
     },
 
-    async getStyleProperty(property, spanId){
+    async getSpanStyleProperty(property, spanId){
         return await module.exports.document.$eval(`#span${spanId}`, (testText, property) => {
             let propertyValue = window.getComputedStyle(testText).getPropertyValue(property);
             if(property == "font-family"){

@@ -3,7 +3,7 @@ const path = require('path');
 
 // Text Parser
 const { toHTML } = require('discord-markdown');
-const { getStyleProperty } = require('./browser');
+const { getSpanStyleProperty } = require('./browser');
 
 // Browser interactions
 const { getPageHeight, getPdfFile, mountDocument } = require(`.${path.sep}browser`);
@@ -37,7 +37,7 @@ module.exports = {
         paragraphFirstLineIndentation: false
     },
 
-    async setStyleProperty(property, value){
+    async setStyleObjProperty(property, value){
         module.exports.style[property] = value;
 
         // If it's an invalid font family, sets it to "Times New Roman"
@@ -47,9 +47,13 @@ module.exports = {
                     `font-family: ${value};` +
                 "}"
             );
-            module.exports.style[property] = await getStyleProperty("font-family", "Test");
+            module.exports.style[property] = await getSpanStyleProperty("font-family", "Test");
         }
         
+        return module.exports.style[property];
+    },
+
+    getStyleObjProperty(property){
         return module.exports.style[property];
     },
 

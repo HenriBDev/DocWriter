@@ -102,7 +102,7 @@ module.exports = {
             }];
             interactionMessage.edit(messageOptions);
             toggleCommandExecution();
-            console.log(`[${new Date().toTimeString()}] interaction finished execution.`);
+            console.log(`[${new Date().toTimeString()}] Interaction finished execution.`);
         }
     }
 }
