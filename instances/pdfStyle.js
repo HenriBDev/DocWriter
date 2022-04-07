@@ -201,14 +201,12 @@ function mountSpanStyle(styleObject, spanId){
     );
     if(styleObject.fontDashed || styleObject.fontUnderline || styleObject.fontOverline){
         styleString += "text-decoration:";
+        styleString += (
+            (styleObject.fontUnderline ? " underline" : "") +
+            (styleObject.fontOverline ? " overline" : "")
+        );
         if(styleObject.fontDashed){
             styleString += ` line-through${styleObject.fontDashed == "double" ? " double; " : "; "}`;
-        }
-        else{
-            styleString += (
-                (styleObject.fontUnderline ? " underline" : "") +
-                (styleObject.fontOverline ? " overline" : "") + "; "
-            );
         }
     }
     styleString += (
