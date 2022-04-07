@@ -31,6 +31,7 @@ module.exports = {
 		fileName = sanitize(fileName)
 
 		// Creates select menu
+		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		const pageSelectMenu = new MessageSelectMenu({
 			customId: "select_menu"
 		});
