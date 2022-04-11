@@ -229,12 +229,13 @@ function mountSpanStyle(styleObject, spanId){
 
 function mountSpan(styleObject, spanText, spanId){
 
-    let mountedSpan = '';
+    let mountedSpan = `<span id="span${spanId}">`;
     if (styleObject.fontSuperscript) mountedSpan += "<sup>";
     if (styleObject.fontSubscript) mountedSpan += "<sub>";
-    mountedSpan = `<span id="span${spanId}">${spanText}</span>`;
+    mountedSpan += spanText;
     if (styleObject.fontSuperscript) mountedSpan += "</sup>";
     if (styleObject.fontSubscript) mountedSpan += "</sub>";
+    mountedSpan += "</span>";
 
     return mountedSpan;
 }
