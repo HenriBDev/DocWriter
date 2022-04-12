@@ -30,7 +30,7 @@ module.exports = {
         fontSubscript: false,
         fontSize: "11pt",
         fontColor: 'black',
-        fontBgcolor: false,
+        fontBgColor: false,
         paragraphAlign: "left",
         paragraphLinesHeight: "0.5cm",
         paragraphFirstLineIndentation: false
@@ -225,7 +225,7 @@ function mountSpanStyle(styleObject, spanId){
     styleString += (
             `font-size: ${styleObject.fontSize}; ` +
             `color: ${styleObject.fontColor}; ` +
-            (styleObject.fontBgcolor ? `background-color: ${styleObject.fontBgcolor}; ` : "") +
+            (styleObject.fontBgColor ? `background-color: ${styleObject.fontBgColor}; ` : "") +
             `text-align: ${styleObject.paragraphAlign}; `
     );
 
