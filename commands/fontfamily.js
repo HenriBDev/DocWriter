@@ -2,7 +2,7 @@
 const path = require('path');
 
 // pdfStyle methods
-const { setStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 
 module.exports = {
     data: {
@@ -29,6 +29,6 @@ module.exports = {
 
         // Sets new font family
         newFontFamily = await setStyleObjProperty("fontFamily", newFontFamily);
-		return await currentChannel.send(`Font-family selected: **${newFontFamily}**`);
+		return await currentChannel.send(`Font-family selected: **${getStyleObjProperty('fontFamliy')}**`);
     }
 }
