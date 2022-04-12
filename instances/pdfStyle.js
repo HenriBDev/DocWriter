@@ -115,7 +115,7 @@ module.exports = {
             // Warns user that this process may be slow
             const waitingMessage = await discordChannel.send("Hold on, this process can take several minutes...");
 
-            let nextPageNeedsBreak = true, currentPageContent = textMessage.split(''), nextPageContent = [], nextPageHeight;
+            let nextPageNeedsBreak = true, currentPageContent = textMessage.split(''), nextPageContent = [], nextPageHeight, contentIsTooBig = false;
 
             // Groups HTML tags and entities in single elements of the array
             let htmlTagsExist = !!currentPageContent.find(value => value == "<");
@@ -128,11 +128,15 @@ module.exports = {
             }
 
             // Breaks text into pages
-            while(nextPageNeedsBreak){
+            while(nextPageNeedsBreak && contentIsTooBig == false){
 
                 // Breaks current page
-                while(currentPageHeight > PAGE_DEFAULT_HEIGHT){
+                while(currentPageHeight > PAGE_DEFAULT_HEIGHT && contentIsTooBig == false){
                     nextPageContent.unshift(currentPageContent.pop());
+                    if(nextPageContent.indexOf(undefined) > -1){ 
+                        contentIsTooBig = true;
+                        continue;
+                    }
                     currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, currentPageContent.join(''), totalSpans), 
                                                             pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
                                                             totalPages);
@@ -144,20 +148,29 @@ module.exports = {
                     }
                 }
 
-                // Checks if next page needs break and loops back in case it does
-                nextPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, nextPageContent.join(''), totalSpans), 
-                                                     pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
-                                                     totalPages);
-                if(nextPageHeight > PAGE_DEFAULT_HEIGHT){
-                    currentPageContent = nextPageContent;
-                    nextPageContent = [];
+                // If the content is not bigger than the page size continue the page breaking
+                if(contentIsTooBig == false){
+
+                    // Checks if next page needs break and loops back in case it does
+                    nextPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, nextPageContent.join(''), totalSpans), 
+                                                         pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
+                                                         totalPages);
+                    if(nextPageHeight > PAGE_DEFAULT_HEIGHT){
+                        currentPageContent = nextPageContent;
+                        nextPageContent = [];
+                    }
+                    else{
+                        totalSpans++;
+                        pdfHtmlContent += mountSpan(styleObject, nextPageContent.join(''), totalSpans);
+                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
+                        nextPageNeedsBreak = false;
+                    }
                 }
-                else{
-                    totalSpans++;
-                    pdfHtmlContent += mountSpan(styleObject, nextPageContent.join(''), totalSpans);
-                    pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
-                    nextPageNeedsBreak = false;
-                }
+            }
+
+            // Throws error if content is too big to fit in any page
+            if(contentIsTooBig){
+                await discordChannel.send("An error has occured: the content added was too big to fit on the page.");
             }
 
             // Updates number of pages
