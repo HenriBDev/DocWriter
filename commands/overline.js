@@ -6,9 +6,9 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontitalic',
+        name: 'overline',
         params: [null],
-        description: "Toggles italic on the current font"
+        description: "Toggles overline on the current font"
     },
     async execute(messageSent, parameters = null){
 
@@ -21,8 +21,8 @@ module.exports = {
 			startMount();
 		}
 
-        // Toggles Italic
-        const italicEnabled = await setStyleObjProperty("fontItalic", !getStyleObjProperty("fontItalic"));
-		return await currentChannel.send(`Italic font: **${italicEnabled ? "Enabled" : "Disabled"}**`);
+        // Toggles Overline
+        const overlineEnabled = await setStyleObjProperty("fontOverline", !getStyleObjProperty("fontOverline"));
+		return await currentChannel.send(`Overline font: **${overlineEnabled ? "Enabled" : "Disabled"}**`);
     }
 }

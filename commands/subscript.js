@@ -6,7 +6,7 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontsubscript',
+        name: 'subscript',
         params: [null],
         description: "Toggles subscript on the current font"
     },

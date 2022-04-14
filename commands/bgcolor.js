@@ -9,9 +9,9 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontbgcolor',
-        params: ['<font_bg_color>'],
-        description: "Changes the font background color (`<font_bg_color>` can be a name or a hex code, ex: `#E0E0E0` or `lightblue`)"
+        name: 'bgcolor',
+        params: ['<bg_color>'],
+        description: "Changes the font background color (`<bg_color>` can be a name or a hex code, ex: `#E0E0E0` or `lightblue`)"
     },
     async execute(messageSent, parameters){
 
@@ -22,7 +22,7 @@ module.exports = {
         if(!parameters || (validateHTMLColorName(parameters.join('')) == false && validateHTMLColorHex(parameters[0]) == false)){
             return await currentChannel.send("Please select a valid color!");
         }
-        let newFontBgColor = parameters.join('');
+        let newBgColor = parameters.join('');
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
@@ -31,7 +31,7 @@ module.exports = {
 		}
 
         // Sets new font color
-        newFontBgColor = await setStyleObjProperty("fontBgColor", newFontBgColor);
+        newBgColor = await setStyleObjProperty("fontBgColor", newBgColor);
 		return await currentChannel.send(`Font-background-color selected: **${getStyleObjProperty('fontBgColor')}**`);
     }
 }

@@ -6,8 +6,8 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontdashed',
-        params: ["<double/null>"],
+        name: 'dashed',
+        params: ["<double/nothing>"],
         description: 'Toggles dashed or double dashed on the current font, add "double" as a parameter to toggle double dashed'
     },
     async execute(messageSent, parameters = null){

@@ -6,7 +6,7 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontsuperscript',
+        name: 'superscript',
         params: [null],
         description: "Toggles superscript on the current font"
     },

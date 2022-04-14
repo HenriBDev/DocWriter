@@ -6,7 +6,7 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontunderline',
+        name: 'underline',
         params: [null],
         description: "Toggles underline on the current font"
     },

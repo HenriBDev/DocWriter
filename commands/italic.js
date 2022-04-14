@@ -6,9 +6,9 @@ const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${pa
 
 module.exports = {
     data: {
-        name: 'fontbold',
+        name: 'italic',
         params: [null],
-        description: "Toggles bold on the current font"
+        description: "Toggles italic on the current font"
     },
     async execute(messageSent, parameters = null){
 
@@ -21,8 +21,8 @@ module.exports = {
 			startMount();
 		}
 
-        // Toggles bold
-        const boldEnabled = await setStyleObjProperty("fontBold", !getStyleObjProperty("fontBold"));
-		return await currentChannel.send(`Bold font: **${boldEnabled ? "Enabled" : "Disabled"}**`);
+        // Toggles Italic
+        const italicEnabled = await setStyleObjProperty("fontItalic", !getStyleObjProperty("fontItalic"));
+		return await currentChannel.send(`Italic font: **${italicEnabled ? "Enabled" : "Disabled"}**`);
     }
 }
