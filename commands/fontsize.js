@@ -27,7 +27,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new font family
+        // Sets new font size
         newFontSize = await setStyleObjProperty("fontSize", newFontSize);
 		return await currentChannel.send(`Current font-size: **${getStyleObjProperty("fontSize")}**`);
     }

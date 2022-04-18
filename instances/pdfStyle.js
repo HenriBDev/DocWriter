@@ -158,6 +158,7 @@ module.exports = {
                     if(nextPageHeight > PAGE_DEFAULT_HEIGHT){
                         currentPageContent = nextPageContent;
                         nextPageContent = [];
+                        currentPageHeight = nextPageHeight;
                     }
                     else{
                         totalSpans++;

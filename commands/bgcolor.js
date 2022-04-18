@@ -30,7 +30,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new font color
+        // Sets new background color
         newBgColor = await setStyleObjProperty("fontBgColor", newBgColor);
 		return await currentChannel.send(`Font-background-color selected: **${getStyleObjProperty('fontBgColor')}**`);
     }

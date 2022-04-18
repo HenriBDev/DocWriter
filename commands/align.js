@@ -15,7 +15,7 @@ module.exports = {
 		// Gets the discord message's data
         const currentChannel = messageSent.channel; 
 
-        // Verifies if sender chose on of the aligns available
+        // Verifies if sender chose one of the alignments available
         if(!parameters || (parameters[0] != "right" && parameters[0] != "left" && parameters[0] != "center" && parameters[0] != "justify")){
             return await currentChannel.send("Please select a valid alignment!");
         }
@@ -27,7 +27,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new font family
+        // Sets new alignment
         newAlignment = await setStyleObjProperty("paragraphAlign", newAlignment);
 		return await currentChannel.send(`Current alignment: **${getStyleObjProperty("paragraphAlign")}**`);
     }

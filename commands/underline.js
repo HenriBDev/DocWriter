@@ -21,7 +21,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Toggles Overline
+        // Toggles Underline
         const underlineEnabled = await setStyleObjProperty("fontUnderline", !getStyleObjProperty("fontUnderline"));
 		return await currentChannel.send(`Underline font: **${underlineEnabled ? "Enabled" : "Disabled"}**`);
     }
