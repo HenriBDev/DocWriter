@@ -33,7 +33,7 @@ module.exports = {
         fontBgColor: false,
         paragraphAlign: "left",
         paragraphLinesHeight: "0.5cm",
-        paragraphFirstLineIndentation: false
+        paragraphFirstLineIndentation: "0cm"
     },
 
     async setStyleObjProperty(property, value){
@@ -102,7 +102,8 @@ module.exports = {
         let pdfHtmlContent = module.exports.pdfHtmlContent, 
             pdfStyleContent = module.exports.pdfStyleContent, 
             totalSpans = module.exports.totalSpans,
-            totalPages = module.exports.totalPages;
+            totalPages = module.exports.totalPages,
+            initialSpan = totalSpans;
 
         // Gets page height
         let currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, textMessage, totalSpans), 
@@ -138,13 +139,13 @@ module.exports = {
                         continue;
                     }
                     currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, currentPageContent.join(''), totalSpans), 
-                                                            pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
+                                                            pdfStyleContent + mountSpanStyle(styleObject, totalSpans, initialSpan),
                                                             totalPages);
                     if(currentPageHeight <= PAGE_DEFAULT_HEIGHT){
-                        totalSpans++;
-                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
+                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans, initialSpan);
                         totalPages++;
                         pdfHtmlContent += mountSpan(styleObject, currentPageContent.join(''), totalSpans) + `</div><div class="page" id="page${totalPages}">`;
+                        totalSpans++;
                     }
                 }
 
@@ -161,9 +162,9 @@ module.exports = {
                         currentPageHeight = nextPageHeight;
                     }
                     else{
-                        totalSpans++;
                         pdfHtmlContent += mountSpan(styleObject, nextPageContent.join(''), totalSpans);
-                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
+                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans, initialSpan);
+                        totalSpans++;
                         nextPageNeedsBreak = false;
                     }
                 }
@@ -203,7 +204,7 @@ module.exports = {
 }
 
 // Other functions
-function mountSpanStyle(styleObject, spanId){
+function mountSpanStyle(styleObject, spanId, initialSpan = null){
 
     let styleString = (
         `#span${spanId}{` +
@@ -233,11 +234,11 @@ function mountSpanStyle(styleObject, spanId){
     if(styleObject.paragraphAlign == "right" || styleObject.paragraphAlign == "center"){
         styleString += "justify-content: " + (styleObject.paragraphAlign == "right" ? "flex-end; " : "center; ");
     }
-    styleString += (
-            `line-height: ${styleObject.paragraphLinesHeight}; ` +
-            `${styleObject.paragraphFirstLineIndentation ? `text-indent: ${styleObject.paragraphFirstLineIndentation};` : ""}` +
-        '}'
-    );
+    styleString += `line-height: ${styleObject.paragraphLinesHeight}; `;
+    if(Number(spanId) == initialSpan || initialSpan == null){
+        styleString += `text-indent: ${styleObject.paragraphFirstLineIndentation}; `;
+    }
+    styleString += "}";
     return styleString;
 }
 
