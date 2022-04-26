@@ -22,7 +22,6 @@ module.exports = {
 
     async getPagePreview(pageNumber){
         const pageSelected = await module.exports.document.$(`#page${pageNumber}`);
-        console.log(await module.exports.document.content());
         return await pageSelected.screenshot();
     },
 
