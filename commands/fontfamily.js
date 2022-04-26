@@ -19,7 +19,10 @@ module.exports = {
         if(!parameters){
             return await currentChannel.send("Please select a font family!");
         }
+
+        // Sets new font family
         let newFontFamily = parameters.join(' ');
+        newFontFamily = await setStyleObjProperty("fontFamily", newFontFamily);
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
@@ -27,8 +30,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new font family
-        newFontFamily = await setStyleObjProperty("fontFamily", newFontFamily);
+        // Responds command
 		return await currentChannel.send(`Font-family selected: **${getStyleObjProperty('fontFamliy')}**`);
     }
 }

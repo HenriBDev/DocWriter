@@ -19,16 +19,18 @@ module.exports = {
         if(!parameters || Number(parameters[0].replace(/,/g, '.')) <= 0){
             return await currentChannel.send("Please select a valid height!");
         }
+
+        // Sets new line height
         let newLineHeight = parameters[0].replace(/,/g, '.') + "cm";
+        newLineHeight = await setStyleObjProperty("paragraphLinesHeight", newLineHeight);
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
-
-        // Sets new line height
-        newLineHeight = await setStyleObjProperty("paragraphLinesHeight", newLineHeight);
+        
+        // Responds command
 		return await currentChannel.send(`Current line-height: **${getStyleObjProperty("paragraphLinesHeight")}**`);
     }
 }

@@ -22,7 +22,10 @@ module.exports = {
         if(!parameters || (validateHTMLColorName(parameters.join('')) == false && validateHTMLColorHex(parameters[0]) == false)){
             return await currentChannel.send("Please select a valid color!");
         }
+
+        // Sets new font color
         let newFontColor = parameters.join('');
+        newFontColor = await setStyleObjProperty("fontColor", newFontColor);
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
@@ -30,8 +33,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new font color
-        newFontColor = await setStyleObjProperty("fontColor", newFontColor);
+        // Responds command
 		return await currentChannel.send(`Font-color selected: **${getStyleObjProperty('fontColor')}**`);
     }
 }

@@ -19,7 +19,10 @@ module.exports = {
         if(!parameters || Number(parameters[0]) <= 0 || Number(parameters[0]) % 1 != 0){
             return await currentChannel.send("Please select a valid size!");
         }
+
+        // Sets new font size
         let newFontSize = parameters[0] + "pt";
+        newFontSize = await setStyleObjProperty("fontSize", newFontSize);
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
@@ -27,8 +30,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new font size
-        newFontSize = await setStyleObjProperty("fontSize", newFontSize);
+        // Responds command
 		return await currentChannel.send(`Current font-size: **${getStyleObjProperty("fontSize")}**`);
     }
 }

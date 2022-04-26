@@ -15,14 +15,16 @@ module.exports = {
 		// Gets the discord message's data
         const currentChannel = messageSent.channel; 
 
+        // Toggles Italic
+        const italicEnabled = await setStyleObjProperty("fontItalic", !getStyleObjProperty("fontItalic"));
+
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
 
-        // Toggles Italic
-        const italicEnabled = await setStyleObjProperty("fontItalic", !getStyleObjProperty("fontItalic"));
+        // Responds command
 		return await currentChannel.send(`Italic font: **${italicEnabled ? "Enabled" : "Disabled"}**`);
     }
 }

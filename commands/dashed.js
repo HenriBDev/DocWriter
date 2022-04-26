@@ -15,12 +15,6 @@ module.exports = {
 		// Gets the discord message's data
         const currentChannel = messageSent.channel; 
 
-        // Checks if a document is already in the making
-		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
-		if(!mounting){
-			startMount();
-		}
-
         let currentDashed = getStyleObjProperty("fontDashed");
         let returnMessage = "";
 
@@ -54,6 +48,12 @@ module.exports = {
                 }
             break;
         }
+
+        // Checks if a document is already in the making
+		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		if(!mounting){
+			startMount();
+		}
 
         // Responds command
 		return await currentChannel.send(returnMessage);

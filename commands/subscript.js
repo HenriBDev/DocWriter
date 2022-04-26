@@ -15,12 +15,6 @@ module.exports = {
 		// Gets the discord message's data
         const currentChannel = messageSent.channel; 
 
-        // Checks if a document is already in the making
-		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
-		if(!mounting){
-			startMount();
-		}
-
         // Checks if subscript is enabled
         let returnMessage = "";
         if(getStyleObjProperty("fontSuperscript")){
@@ -30,6 +24,14 @@ module.exports = {
 
         // Toggles Superscript
         const subscriptEnabled = await setStyleObjProperty("fontSubscript", !getStyleObjProperty("fontSubscript"));
+
+        // Checks if a document is already in the making
+		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		if(!mounting){
+			startMount();
+		}
+
+        // Responds command
 		return await currentChannel.send(returnMessage + `Subscript font: **${subscriptEnabled ? "Enabled" : "Disabled"}**`);
     }
 }

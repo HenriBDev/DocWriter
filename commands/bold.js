@@ -15,14 +15,16 @@ module.exports = {
 		// Gets the discord message's data
         const currentChannel = messageSent.channel; 
 
+        // Toggles bold
+        const boldEnabled = await setStyleObjProperty("fontBold", !getStyleObjProperty("fontBold"));
+
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
 
-        // Toggles bold
-        const boldEnabled = await setStyleObjProperty("fontBold", !getStyleObjProperty("fontBold"));
+        // Responds command
 		return await currentChannel.send(`Bold font: **${boldEnabled ? "Enabled" : "Disabled"}**`);
     }
 }

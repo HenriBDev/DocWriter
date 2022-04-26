@@ -15,14 +15,16 @@ module.exports = {
 		// Gets the discord message's data
         const currentChannel = messageSent.channel; 
 
+        // Toggles Overline
+        const overlineEnabled = await setStyleObjProperty("fontOverline", !getStyleObjProperty("fontOverline"));
+
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
 		if(!mounting){
 			startMount();
 		}
 
-        // Toggles Overline
-        const overlineEnabled = await setStyleObjProperty("fontOverline", !getStyleObjProperty("fontOverline"));
+        // Responds command
 		return await currentChannel.send(`Overline font: **${overlineEnabled ? "Enabled" : "Disabled"}**`);
     }
 }

@@ -22,6 +22,7 @@ module.exports = {
 
     async getPagePreview(pageNumber){
         const pageSelected = await module.exports.document.$(`#page${pageNumber}`);
+        console.log(await module.exports.document.content());
         return await pageSelected.screenshot();
     },
 
@@ -31,12 +32,12 @@ module.exports = {
     },
 
     async mountDocument(htmlContent, styleContent){
-        await module.exports.document.setContent(htmlContent + "</div></body></html>");
+        await module.exports.document.setContent(htmlContent + "</div></div></body></html>");
         await module.exports.document.addStyleTag({content: styleContent});
     },
 
-    async getSpanStyleProperty(property, spanId){
-        return await module.exports.document.$eval(`#span${spanId}`, (testText, property) => {
+    async getParagraphStyleProperty(property, paragraphId){
+        return await module.exports.document.$eval(`#paragraph${paragraphId}`, (testText, property) => {
             let propertyValue = window.getComputedStyle(testText).getPropertyValue(property);
             if(property == "font-family"){
                 let fontSize = window.getComputedStyle(testText).getPropertyValue("font-size");

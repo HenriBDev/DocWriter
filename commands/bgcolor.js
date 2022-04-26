@@ -22,7 +22,10 @@ module.exports = {
         if(!parameters || (validateHTMLColorName(parameters.join('')) == false && validateHTMLColorHex(parameters[0]) == false)){
             return await currentChannel.send("Please select a valid color!");
         }
+
+        // Sets new background color
         let newBgColor = parameters.join('');
+        newBgColor = await setStyleObjProperty("fontBgColor", newBgColor);
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
@@ -30,8 +33,7 @@ module.exports = {
 			startMount();
 		}
 
-        // Sets new background color
-        newBgColor = await setStyleObjProperty("fontBgColor", newBgColor);
+        // Responds command
 		return await currentChannel.send(`Font-background-color selected: **${getStyleObjProperty('fontBgColor')}**`);
     }
 }

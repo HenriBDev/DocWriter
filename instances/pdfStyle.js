@@ -5,7 +5,7 @@ const path = require('path');
 const { toHTML } = require('discord-markdown');
 
 // Browser interactions
-const { getPageHeight, getPdfFile, mountDocument, getSpanStyleProperty } = require(`.${path.sep}browser`);
+const { getPageHeight, getPdfFile, mountDocument, getParagraphStyleProperty } = require(`.${path.sep}browser`);
 
 // Page (A4 paper) height and width in pixels (96 dpi)
 const PAGE_DEFAULT_HEIGHT = 1122.5;
@@ -13,6 +13,14 @@ const PAGE_DEFAULT_WIDTH =  793.5;
 
 // Reset CSS string
 const RESET_CSS = "/* http://meyerweb.com/eric/tools/css/reset/ v2.0 (public domain)*/html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, img, ins, kbd, q, s, samp,small, strike, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body {line-height: 1;}ol, ul {list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after,q:before, q:after {content: '';content: none;}table {border-collapse: collapse;border-spacing: 0;}";
+
+// Default html5 opening and closing tags
+const OPENING_TAG_HTML = "<!DOCTYPE html><html><body>",
+      CLOSING_TAG_HTML = "</body></html>";
+
+// Default page and paragraph settings on CSS
+const DEFAULT_PAGE = '.page{overflow-wrap: anywhere;}',
+      DEFAULT_PARAGRAPH = '.paragraph{display: flex}';
 
 module.exports = {
 
@@ -42,12 +50,12 @@ module.exports = {
 
         // If it's an invalid font family, sets it to "Times New Roman"
         if(property == "fontFamily"){
-            await mountDocument(module.exports.pdfHtmlContent + '<span id="spanTest">test</span>', 
-                "#spanTest{" +
+            await mountDocument(OPENING_TAG_HTML + '<div id="paragraphTest">test</div>', 
+                "#paragraphTest{" +
                     `font-family: ${value};` +
                 "}"
             );
-            module.exports.style[property] = await getSpanStyleProperty("font-family", "Test");
+            module.exports.style[property] = await getParagraphStyleProperty("font-family", "Test");
         }
         
         return module.exports.style[property];
@@ -60,7 +68,7 @@ module.exports = {
     pdfHtmlContent: null,
     pdfStyleContent: null,
     mounting: false,
-    totalSpans: 0,
+    totalParagraphs: 0,
     totalPages: 1,
     pageSelected: 1, 
 
@@ -68,21 +76,15 @@ module.exports = {
 
         const styleObject = module.exports.style;
         module.exports.pdfHtmlContent = (
-            '<!DOCTYPE html>' +
-            '<html>' +
-                '<body>' +
-                    '<div class="page" id="page1" style="'+ 
-                                                    `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
-                                                    `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.paddingTop) + convertToPixels(styleObject.paddingBottom))}px; ` + 
-                                                    `min-width: ${PAGE_DEFAULT_WIDTH - (convertToPixels(styleObject.paddingRight) + convertToPixels(styleObject.paddingLeft))}px; ">`
+            OPENING_TAG_HTML +   
+            '<div class="page" id="page1" style="'+ 
+                                                `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
+                                                `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.paddingTop) + convertToPixels(styleObject.paddingBottom))}px; ` + 
+                                                `max-width: ${PAGE_DEFAULT_WIDTH - (convertToPixels(styleObject.paddingRight) + convertToPixels(styleObject.paddingLeft))}px; ">`
+        
         );
-        module.exports.pdfStyleContent = RESET_CSS + (
-            '.page{' +
-                'overflow-wrap: anywhere;' +
-            '}'
-        )
+        module.exports.pdfStyleContent = RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH;
         module.exports.mounting = true;
-        module.exports.totalSpans = 0;
         module.exports.totalPages = 1;
 
     },
@@ -96,21 +98,34 @@ module.exports = {
 
     async addContent(textMessage, discordChannel){
 
-        // Parses Discord's Markdown and HTML entities
-        textMessage = toHTML(textMessage);
-
         // Gets module properties for better reading
         const styleObject = module.exports.style;
         let pdfHtmlContent = module.exports.pdfHtmlContent, 
-            pdfStyleContent = module.exports.pdfStyleContent, 
-            totalSpans = module.exports.totalSpans,
-            totalPages = module.exports.totalPages,
-            initialSpan = totalSpans;
+            pdfStyleContent = module.exports.pdfStyleContent,
+            totalPages = module.exports.totalPages;
+
+        // Parses Discord's Markdown and HTML entities
+        textMessage = toHTML(textMessage);
+        
+        // Turns text into an array
+        textMessage = textMessage.split('');
+
+        // Groups HTML tags and entities in single elements of the array
+        let htmlTagsExist = !!textMessage.find(value => value == "<");
+        if(htmlTagsExist){
+            textMessage = groupHtmlElements("tags", textMessage);
+        }
+        let htmlEntitiesExist = !!textMessage.find(value => value == "&");
+        if(htmlEntitiesExist){
+            textMessage = groupHtmlElements("entities", textMessage);
+        }
+
+        // Adds paragraphs when there are consecutive line breaks
+        textMessage = addParagraphs(textMessage);
 
         // Gets page height
-        let currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, textMessage, totalSpans), 
-                                                    pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
-                                                    totalPages);
+        let currentPageHeight = await getPageHeight(pdfHtmlContent + textMessage.join('') + "</div>" + CLOSING_TAG_HTML, 
+                                                    pdfStyleContent, totalPages);
 
         // Breaks pages if needed
         if (currentPageHeight > PAGE_DEFAULT_HEIGHT){
@@ -118,67 +133,81 @@ module.exports = {
             // Warns user that this process may be slow
             const waitingMessage = await discordChannel.send("Hold on, this process can take several minutes...");
 
-            let nextPageNeedsBreak = true, currentPageContent = textMessage.split(''), nextPageContent = [], nextPageHeight, contentIsTooBig = false;
-
-            // Groups HTML tags and entities in single elements of the array
-            let htmlTagsExist = !!currentPageContent.find(value => value == "<");
-            if(htmlTagsExist){
-                currentPageContent = groupHtmlElements("tags", currentPageContent);
-            }
-            let htmlEntitiesExist = !!currentPageContent.find(value => value == "&");
-            if(htmlEntitiesExist){
-                currentPageContent = groupHtmlElements("entities", currentPageContent);
-            }
+            let currentPageContent = textMessage, 
+                nextPageContent = [], 
+                nextPageHeight,
+                contentLength, 
+                contentBiggerThanPage = false,
+                thereAreOpenTags = false, 
+                closingTags = [], openingTags = [], i = 0;
 
             // Breaks text into pages
-            while(nextPageNeedsBreak && contentIsTooBig == false){
+            while(currentPageHeight > PAGE_DEFAULT_HEIGHT && contentBiggerThanPage == false){
 
-                // Breaks current page
-                while(currentPageHeight > PAGE_DEFAULT_HEIGHT && contentIsTooBig == false){
-                    nextPageContent.unshift(currentPageContent.pop());
-                    if(nextPageContent.indexOf(undefined) > -1){ 
-                        contentIsTooBig = true;
-                        continue;
-                    }
-                    currentPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, currentPageContent.join(''), totalSpans), 
-                                                            pdfStyleContent + mountSpanStyle(styleObject, totalSpans, initialSpan),
-                                                            totalPages);
-                    if(currentPageHeight <= PAGE_DEFAULT_HEIGHT){
-                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans, initialSpan);
-                        totalPages++;
-                        pdfHtmlContent += (mountSpan(styleObject, currentPageContent.join(''), totalSpans) + 
-                                            `</div><div class="page" id="page${totalPages}" style="` + 
-                                                                                            `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
-                                                                                            `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.paddingTop) + convertToPixels(styleObject.paddingBottom))}px; ` + 
-                                                                                            `min-width: ${PAGE_DEFAULT_WIDTH - (convertToPixels(styleObject.paddingRight) + convertToPixels(styleObject.paddingLeft))}px; ">`
-                        );
-                        totalSpans++;
+                // Closes tag on current page if it's closing tag went to the next page
+                contentLength = currentPageContent.length;
+                if(contentLength > 0){
+                    if(currentPageContent[contentLength - 1].startsWith("<") && currentPageContent[contentLength - 1] != "<br>" && currentPageContent[contentLength - 1].includes("/")){
+                        thereAreOpenTags = true;
+                        closingTags.unshift(currentPageContent[contentLength - 1]);
+                    } else if (currentPageContent[contentLength - 2].startsWith("<") && !currentPageContent[contentLength - 2].includes("/") && currentPageContent[contentLength - 2] != "<br>"){
+                        nextPageContent.unshift(currentPageContent.pop());
+                        closingTags.shift();
+                        if(closingTags.length < 1){
+                            thereAreOpenTags = false;
+                        }
                     }
                 }
 
-                // If the content is not bigger than the page size continue the page breaking
-                if(contentIsTooBig == false){
+                // Measures the new height of the current page
+                nextPageContent.unshift(currentPageContent.pop());
+                if(nextPageContent.indexOf(undefined) > -1){ 
+                    contentBiggerThanPage = true;
+                    continue;
+                }
+                currentPageHeight = await getPageHeight(pdfHtmlContent + 
+                                                        currentPageContent.join('') + (thereAreOpenTags ? closingTags.join('') : "") + "</div>" + CLOSING_TAG_HTML,
+                                                        pdfStyleContent, totalPages);
+                // Goes to the next page if the current page height is valid
+                if(currentPageHeight <= PAGE_DEFAULT_HEIGHT){
+                    totalPages++;
+                    pdfHtmlContent += (currentPageContent.join('') + (thereAreOpenTags ? closingTags.join('') : "") + 
+                        `</div><div class="page" id="page${totalPages}" style="` + 
+                                                                            `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
+                                                                            `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.paddingTop) + convertToPixels(styleObject.paddingBottom))}px; ` + 
+                                                                            `min-width: ${PAGE_DEFAULT_WIDTH - (convertToPixels(styleObject.paddingRight) + convertToPixels(styleObject.paddingLeft))}px; ">`
+                    );
+                
+                    // Opens tags that were to close on the next page
+                    if(thereAreOpenTags){
+                        openingTags = closingTags.map(tag => {
+                            if(tag.includes("div")){
+                                return `<div class="paragraph" style="${mountParagraphStyle(module.exports.style, true)}">`;
+                            }else{
+                                tag = tag.split('');
+                                tag.splice(1,1);
+                                return tag.join('');
+                            }
+                        });
+                        nextPageContent = openingTags.reverse().concat(nextPageContent);
+                    }
 
                     // Checks if next page needs break and loops back in case it does
-                    nextPageHeight = await getPageHeight(pdfHtmlContent + mountSpan(styleObject, nextPageContent.join(''), totalSpans), 
-                                                         pdfStyleContent + mountSpanStyle(styleObject, totalSpans),
-                                                         totalPages);
+                    nextPageHeight = await getPageHeight(pdfHtmlContent + nextPageContent.join('') + "</div>" + CLOSING_TAG_HTML, 
+                                                         pdfStyleContent, totalPages);
                     if(nextPageHeight > PAGE_DEFAULT_HEIGHT){
                         currentPageContent = nextPageContent;
                         nextPageContent = [];
                         currentPageHeight = nextPageHeight;
                     }
                     else{
-                        pdfHtmlContent += mountSpan(styleObject, nextPageContent.join(''), totalSpans);
-                        pdfStyleContent += mountSpanStyle(styleObject, totalSpans, initialSpan);
-                        totalSpans++;
-                        nextPageNeedsBreak = false;
+                        pdfHtmlContent += nextPageContent.join('');
                     }
                 }
             }
 
-            // Throws error if content is too big to fit in any page
-            if(contentIsTooBig){
+            // Throws error if content is too big to fit in a page
+            if(contentBiggerThanPage){
                 await discordChannel.send("An error has occured: the content added was too big to fit on the page.");
             }
 
@@ -190,16 +219,13 @@ module.exports = {
                 await waitingMessage.delete();
             }catch{}
         }
-        else{  
-            totalSpans++;    
-            pdfHtmlContent += mountSpan(styleObject, textMessage, totalSpans);
-            pdfStyleContent += mountSpanStyle(styleObject, totalSpans);
+        else{   
+            pdfHtmlContent += textMessage.join('');
         }
 
         // Updates the rest of the module and the document
         module.exports.pdfStyleContent = pdfStyleContent;
         module.exports.pdfHtmlContent = pdfHtmlContent;
-        module.exports.totalSpans = totalSpans;
         module.exports.selectPage(totalPages);
         await mountDocument(pdfHtmlContent, pdfStyleContent);
         
@@ -212,11 +238,15 @@ module.exports = {
 }
 
 // Other functions
-function mountSpanStyle(styleObject, spanId, initialSpan = null){
+function mountParagraphStyle(styleObject, nextPage = false){
 
-    let styleString = (
-        `#span${spanId}{` +
-            'display: flex;' +
+    let styleString = "";
+    if(nextPage == false){
+        styleString += `text-indent: ${module.exports.style.paragraphFirstLineIndentation}; `;
+    }
+    styleString += (
+            `justify-content: ${module.exports.style.paragraphAlign == "justify" ? "space-between" : module.exports.style.paragraphAlign}; ` +
+            `max-width: ${PAGE_DEFAULT_WIDTH - (convertToPixels(styleObject.paddingRight) + convertToPixels(styleObject.paddingLeft))}px;` +
             `font-family: ${styleObject.fontFamily}; ` +
             `font-weight: ${styleObject.fontBold ? "bold; " : "normal; "}` +
             `${styleObject.fontItalic ? "font-style: italic; " : ""}`
@@ -238,29 +268,8 @@ function mountSpanStyle(styleObject, spanId, initialSpan = null){
             (styleObject.fontBgColor ? `background-color: ${styleObject.fontBgColor}; ` : "") +
             `text-align: ${styleObject.paragraphAlign}; `
     );
-
-    if(styleObject.paragraphAlign == "right" || styleObject.paragraphAlign == "center"){
-        styleString += "justify-content: " + (styleObject.paragraphAlign == "right" ? "flex-end; " : "center; ");
-    }
     styleString += `line-height: ${styleObject.paragraphLinesHeight}; `;
-    if(Number(spanId) == initialSpan || initialSpan == null){
-        styleString += `text-indent: ${styleObject.paragraphFirstLineIndentation}; `;
-    }
-    styleString += "}";
     return styleString;
-}
-
-function mountSpan(styleObject, spanText, spanId){
-
-    let mountedSpan = `<span id="span${spanId}">`;
-    if (styleObject.fontSuperscript) mountedSpan += "<sup>";
-    if (styleObject.fontSubscript) mountedSpan += "<sub>";
-    mountedSpan += spanText;
-    if (styleObject.fontSuperscript) mountedSpan += "</sup>";
-    if (styleObject.fontSubscript) mountedSpan += "</sub>";
-    mountedSpan += "</span>";
-
-    return mountedSpan;
 }
 
 function groupHtmlElements(elementType, text){
@@ -283,6 +292,19 @@ function groupHtmlElements(elementType, text){
         }
     }
     return text
+}
+
+function addParagraphs(textSeparated){
+    textSeparated.unshift(`<div class="paragraph" style="${mountParagraphStyle(module.exports.style)}">`);
+    textSeparated.push("</div>");
+    for(i = 0; i < textSeparated.length - 1; i++){
+        if(i > 0 && 
+           textSeparated[i] == "<br>" &&  
+           textSeparated[i + 1] != "<br>"){
+            textSeparated.splice(i + 1, 0, "</div>", `<div class="paragraph" style="${mountParagraphStyle(module.exports.style)}">`);
+        }
+    }
+    return textSeparated;
 }
 
 function convertToPixels(value){
