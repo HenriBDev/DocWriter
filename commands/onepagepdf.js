@@ -16,9 +16,9 @@ const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`)
 // Event
 module.exports = {
 	data: {
-		name: 'generate',
+		name: 'onepagepdf',
 		params: ['<file_name>'],
-		description: "Generates a PDF file using the user's last text message"
+		description: "Generates a one-page PDF file using the user's last text message"
 	},
 	async execute(messageSent, parameters){
 		
