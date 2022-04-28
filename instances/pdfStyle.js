@@ -22,6 +22,10 @@ const OPENING_TAG_HTML = "<!DOCTYPE html><html><body>",
 const DEFAULT_PAGE = '.page{overflow-wrap: anywhere;}',
       DEFAULT_PARAGRAPH = '.paragraph{display: flex}';
 
+// Page content instances
+let pageInstances = [],
+    currentInstance = 0;
+
 module.exports = {
 
     style: {
@@ -66,9 +70,8 @@ module.exports = {
     },
 
     pdfHtmlContent: null,
-    pdfStyleContent: null,
+    pdfStyleContent: RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH,
     mounting: false,
-    totalParagraphs: 0,
     totalPages: 1,
     pageSelected: 1, 
 
@@ -83,9 +86,10 @@ module.exports = {
                                                 `max-width: ${PAGE_DEFAULT_WIDTH - (convertToPixels(styleObject.paddingRight) + convertToPixels(styleObject.paddingLeft))}px; ">`
         
         );
-        module.exports.pdfStyleContent = RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH;
         module.exports.mounting = true;
         module.exports.totalPages = 1;
+        pageInstances = [[module.exports.pdfHtmlContent, module.exports.totalPages]];
+        currentInstance = 0;
 
     },
 
@@ -99,9 +103,9 @@ module.exports = {
     async addContent(textMessage, discordChannel){
 
         // Gets module properties for better reading
-        const styleObject = module.exports.style;
-        let pdfHtmlContent = module.exports.pdfHtmlContent, 
-            pdfStyleContent = module.exports.pdfStyleContent,
+        const styleObject = module.exports.style,
+              pdfStyleContent = module.exports.pdfStyleContent;
+        let pdfHtmlContent = module.exports.pdfHtmlContent,
             totalPages = module.exports.totalPages;
 
         // Parses Discord's Markdown and HTML entities
@@ -224,15 +228,41 @@ module.exports = {
         }
 
         // Updates the rest of the module and the document
-        module.exports.pdfStyleContent = pdfStyleContent;
         module.exports.pdfHtmlContent = pdfHtmlContent;
-        module.exports.selectPage(totalPages);
+        module.exports.pageSelected = totalPages;
+        if(pageInstances.length == 20){
+            pageInstances.shift();
+        }else{
+            if(pageInstances.length - 1 > currentInstance){
+                pageInstances.splice(currentInstance);
+            }
+        }
+        currentInstance++;
+        pageInstances.push([pdfHtmlContent, totalPages]);
         await mountDocument(pdfHtmlContent, pdfStyleContent);
         
     },
 
-    selectPage(pageNumber){
-        module.exports.pageSelected = pageNumber;
+    async undoAddition(){
+        if(currentInstance > 0){
+            currentInstance--;
+            module.exports.pdfHtmlContent = pageInstances[currentInstance][0];
+            module.exports.selectedPage = pageInstances[currentInstance][1];
+            await mountDocument(module.exports.pdfHtmlContent, module.exports.pdfStyleContent);
+            return true;
+        }
+        return false;
+    },
+
+    async redoAddition(){
+        if(currentInstance != 19 && pageInstances.length > currentInstance + 1){
+            currentInstance++;
+            module.exports.pdfHtmlContent = pageInstances[currentInstance][0];
+            module.exports.selectedPage = pageInstances[currentInstance][1];
+            await mountDocument(module.exports.pdfHtmlContent, module.exports.pdfStyleContent);
+            return true;
+        }
+        return false;
     }
     
 }
