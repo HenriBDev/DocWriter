@@ -230,14 +230,14 @@ module.exports = {
         // Updates the rest of the module and the document
         module.exports.pdfHtmlContent = pdfHtmlContent;
         module.exports.pageSelected = totalPages;
+        if(pageInstances.length - 1 > currentInstance){
+            pageInstances.splice(currentInstance + 1);
+        }
         if(pageInstances.length == 20){
             pageInstances.shift();
         }else{
-            if(pageInstances.length - 1 > currentInstance){
-                pageInstances.splice(currentInstance);
-            }
+            currentInstance++;
         }
-        currentInstance++;
         pageInstances.push([pdfHtmlContent, totalPages]);
         await mountDocument(pdfHtmlContent, pdfStyleContent);
         
