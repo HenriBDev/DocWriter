@@ -5,7 +5,7 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // pdfStyle methods
-const { startMount, addContent } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { startMount, addContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
 const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
@@ -14,7 +14,7 @@ module.exports = {
     data: {
         name: 'addcontent',
         params: [null],
-        description: "Adds last message to the PDF without finishing the mounting"
+        description: "Adds last message to the document without finishing the mounting"
     },
     async execute(messageSent, parameters = null){
 
@@ -37,7 +37,7 @@ module.exports = {
 		}
 
 		// Checks if a document is already in the making
-		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		if(!mounting){
 			startMount();
 		}
@@ -47,7 +47,7 @@ module.exports = {
 		await addContent(senderLastMessage, currentChannel);
 
 		// Creates select menu
-		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 		const pageSelectMenu = new MessageSelectMenu({
 			customId: "select_menu"
 		});

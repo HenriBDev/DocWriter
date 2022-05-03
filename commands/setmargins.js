@@ -1,8 +1,11 @@
 // Node modules
 const path = require('path');
 
+// Importing the bot's prefix
+const { PREFIX } = require(`..${path.sep}instances${path.sep}client`);
+
 // pdfStyle methods
-const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // browser methods
 const { setPageMarginLength, mountDocument } = require(`..${path.sep}instances${path.sep}browser`);
@@ -11,7 +14,7 @@ module.exports = {
     data: {
         name: 'setmargins',
         params: ['<margin_top/.>','<margin_right/.>','<margin_bottom/.>','<margin_left/.>'],
-        description: "Changes the margin measurements (use `.` if you don't want to change, example: `pdf|setmargins . . 3 .` -> will set margin-bottom to 3cm)"
+        description: "Changes the margin measurements (use `.` if you don't want to change, example: `" + PREFIX + "setmargins . . 3 .` -> will set margin-bottom to 3cm)"
     },
     async execute(messageSent, parameters){
 
@@ -24,14 +27,14 @@ module.exports = {
         }else{
             let marginDimension;
             // Checks if a document is already in the making
-		    const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		    const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		    if(!mounting){
 			    startMount();
-                const { pdfHtmlContent, pdfStyleContent } = require(`..${path.sep}instances${path.sep}pdfStyle`);
-                mountDocument(pdfHtmlContent, pdfStyleContent);
+                const { docHtmlContent, docStyleContent } = require(`..${path.sep}instances${path.sep}docStyle`);
+                mountDocument(docHtmlContent, docStyleContent);
 		    }
             // Gets last span added
-            const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+            const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
             for(let i = 0; i < 4; i++){
                 if(parameters[i] != "." && Number(parameters[i].replace(/,/g, '.')) <= 0){
                     return await currentChannel.send("Please select valid lengths!");

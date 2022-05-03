@@ -16,7 +16,7 @@ module.exports = {
     executingCommand: false,
     executingInteraction: false,
     BOT_TOKEN: process.env.BOT_TOKEN,
-    PREFIX: "pdf|",
+    PREFIX: "doc|",
 
     toggleCommandExecution(){
         module.exports.executingCommand = !module.exports.executingCommand

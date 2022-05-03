@@ -1,9 +1,15 @@
+// Node modules
+const path = require('path');
+
+// Importing the bot's prefix
+const { PREFIX } = require(`..${path.sep}instances${path.sep}client`);
+
 // Event
 module.exports = {
 	data: {
 		name: 'help',
         params: [null],
-		description: "Show all available commands for PDFMaker"
+		description: "Show all available commands for DocWriter"
 	},
 
 	execute(messageSent, parameters = null){
@@ -22,18 +28,18 @@ module.exports = {
 		// Initializes helpString
 		module.exports.helpString = "**Available commands:**\n" +
 									"(You can chain commands using `|`)\n" +
-									"For example: `pdf|addcontent|finishpdf myPdfFile`\n" +
+									"For example: `" + PREFIX + "addcontent|exportpdf myPdfFile`\n" +
 									"\n" +
-									"**pdf|help** -> Show all available commands for PDFMaker";
+									`**${PREFIX}help** -> Show all available commands for DocWriter`;
 
 		// Adds all available commands to the helpString
 		client.commands.forEach(command => {
 		    if(command.data.name !== "help"){
 			
-				//**pdf|<command_name>** ...`<command_params>` -> <command_description>
+				//**doc|<command_name>** ...`<command_params>` -> <command_description>
 			
 				// Command name
-		        module.exports.helpString += "\n\n**pdf|" + command.data.name + "** "; 
+		        module.exports.helpString += `\n\n**${PREFIX}${command.data.name}** `; 
 			
 				// Command parameters
 				command.data.params.forEach(param => {
@@ -44,6 +50,7 @@ module.exports = {
 				module.exports.helpString += "-> " + command.data.description;
 		    }
 		})
+		module.exports.helpString = "In maintenance due to character limit.";
 	}
 
 };

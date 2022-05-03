@@ -2,7 +2,7 @@
 const path = require('path');
 
 // pdfStyle methods
-const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 module.exports = {
     data: {
@@ -19,7 +19,7 @@ module.exports = {
         const underlineEnabled = await setStyleObjProperty("fontUnderline", !getStyleObjProperty("fontUnderline"));
 
         // Checks if a document is already in the making
-		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		if(!mounting){
 			startMount();
 		}

@@ -5,7 +5,7 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // pdfStyle methods
-const { finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { finishMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Filename sanitizer
 const sanitize = require('sanitize-filename');
@@ -13,7 +13,7 @@ const sanitize = require('sanitize-filename');
 // Command
 module.exports = {
     data: {
-        name: 'finishpdf',
+        name: 'exportpdf',
         params: ['<file_name>'],
         description: "Finishes mounting the document and export it as PDF"
     },
@@ -31,7 +31,7 @@ module.exports = {
 		fileName = sanitize(fileName)
 
 		// Creates select menu
-		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 		const pageSelectMenu = new MessageSelectMenu({
 			customId: "select_menu"
 		});

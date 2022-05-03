@@ -8,7 +8,7 @@ const { MessageSelectMenu } = require('discord.js');
 const { getPagePreview, mountDocument } = require(`..${path.sep}instances${path.sep}browser`);
 
 // pdfStyle methods
-const { startMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 module.exports = {
     data: {
@@ -22,13 +22,13 @@ module.exports = {
         const currentChannel = messageSent.channel;
 
         // Checks if a document is already in the making
-		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		if(!mounting){
 			startMount();
 		}
 
 		// Creates select menu
-		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 		const pageSelectMenu = new MessageSelectMenu({
 			customId: "select_menu"
 		});
@@ -41,8 +41,8 @@ module.exports = {
 		}
 
 		// Creates file preview and responds command
-        const { pdfHtmlContent, pdfStyleContent } = require(`..${path.sep}instances${path.sep}pdfStyle`);
-        await mountDocument(pdfHtmlContent, pdfStyleContent);
+        const { docHtmlContent, docStyleContent } = require(`..${path.sep}instances${path.sep}docStyle`);
+        await mountDocument(docHtmlContent, docStyleContent);
 		const previewFile = await getPagePreview(totalPages);
 		return await currentChannel.send(
 			{

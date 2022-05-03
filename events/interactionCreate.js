@@ -5,7 +5,7 @@ const path = require('path')
 const { MessageSelectMenu } = require('discord.js');
 
 // pdfStyle methods
-const { selectPage } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { selectPage } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
 const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
@@ -37,7 +37,7 @@ module.exports = {
             let interactionMessage, newPageSelection, messageOptions = {};
 
             // Gets current number of pages and which one is selected
-            const { totalPages, pageSelected } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+            const { totalPages, pageSelected } = require(`..${path.sep}instances${path.sep}docStyle`);
 		   
             // Gets message with the preview image
             await interaction.channel.messages.fetch().then(channelMessages => {

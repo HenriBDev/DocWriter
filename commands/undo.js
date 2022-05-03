@@ -2,7 +2,7 @@
 const path = require('path');
 
 // pdfStyle methods
-const { undoAddition } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { undoAddition } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser methods
 const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
@@ -27,7 +27,7 @@ module.exports = {
         }
 
         // Creates select menu
-		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 		const pageSelectMenu = new MessageSelectMenu({
 			customId: "select_menu"
 		});

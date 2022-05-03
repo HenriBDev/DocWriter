@@ -54,7 +54,7 @@ module.exports = {
 
         // If it's an invalid font family, sets it to "Times New Roman"
         if(property == "fontFamily"){
-            await mountDocument(OPENING_TAG_HTML + '<div id="paragraphTest">test</div>', 
+            await mountDocument(OPENING_TAG_HTML + '<div><div id="paragraphTest">test', 
                 "#paragraphTest{" +
                     `font-family: ${value};` +
                 "}"
@@ -69,8 +69,8 @@ module.exports = {
         return module.exports.style[property];
     },
 
-    pdfHtmlContent: null,
-    pdfStyleContent: RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH,
+    docHtmlContent: null,
+    docStyleContent: RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH,
     mounting: false,
     totalPages: 1,
     pageSelected: 1, 
@@ -78,7 +78,7 @@ module.exports = {
     startMount(){
 
         const styleObject = module.exports.style;
-        module.exports.pdfHtmlContent = (
+        module.exports.docHtmlContent = (
             OPENING_TAG_HTML +   
             '<div class="page" id="page1" style="'+ 
                                                 `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
@@ -88,7 +88,7 @@ module.exports = {
         );
         module.exports.mounting = true;
         module.exports.totalPages = 1;
-        pageInstances = [[module.exports.pdfHtmlContent, module.exports.totalPages]];
+        pageInstances = [[module.exports.docHtmlContent, module.exports.totalPages]];
         currentInstance = 0;
 
     },
@@ -96,7 +96,7 @@ module.exports = {
     async finishMount(){
 
         module.exports.mounting = false;
-        return await getPdfFile(module.exports.pdfHtmlContent, module.exports.pdfStyleContent, module.exports.totalPages);
+        return await getPdfFile(module.exports.docHtmlContent, module.exports.docStyleContent, module.exports.totalPages);
 
     },
 
@@ -104,8 +104,8 @@ module.exports = {
 
         // Gets module properties for better reading
         const styleObject = module.exports.style,
-              pdfStyleContent = module.exports.pdfStyleContent;
-        let pdfHtmlContent = module.exports.pdfHtmlContent,
+              docStyleContent = module.exports.docStyleContent;
+        let docHtmlContent = module.exports.docHtmlContent,
             totalPages = module.exports.totalPages;
 
         // Parses Discord's Markdown and HTML entities
@@ -128,8 +128,8 @@ module.exports = {
         textMessage = addParagraphs(textMessage);
 
         // Gets page height
-        let currentPageHeight = await getPageHeight(pdfHtmlContent + textMessage.join('') + "</div>" + CLOSING_TAG_HTML, 
-                                                    pdfStyleContent, totalPages);
+        let currentPageHeight = await getPageHeight(docHtmlContent + textMessage.join('') + "</div>" + CLOSING_TAG_HTML, 
+                                                    docStyleContent, totalPages);
 
         // Breaks pages if needed
         if (currentPageHeight > PAGE_DEFAULT_HEIGHT){
@@ -169,13 +169,13 @@ module.exports = {
                     contentBiggerThanPage = true;
                     continue;
                 }
-                currentPageHeight = await getPageHeight(pdfHtmlContent + 
+                currentPageHeight = await getPageHeight(docHtmlContent + 
                                                         currentPageContent.join('') + (thereAreOpenTags ? closingTags.join('') : "") + "</div>" + CLOSING_TAG_HTML,
-                                                        pdfStyleContent, totalPages);
+                                                        docStyleContent, totalPages);
                 // Goes to the next page if the current page height is valid
                 if(currentPageHeight <= PAGE_DEFAULT_HEIGHT){
                     totalPages++;
-                    pdfHtmlContent += (currentPageContent.join('') + (thereAreOpenTags ? closingTags.join('') : "") + 
+                    docHtmlContent += (currentPageContent.join('') + (thereAreOpenTags ? closingTags.join('') : "") + 
                         `</div><div class="page" id="page${totalPages}" style="` + 
                                                                             `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
                                                                             `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.paddingTop) + convertToPixels(styleObject.paddingBottom))}px; ` + 
@@ -197,15 +197,15 @@ module.exports = {
                     }
 
                     // Checks if next page needs break and loops back in case it does
-                    nextPageHeight = await getPageHeight(pdfHtmlContent + nextPageContent.join('') + "</div>" + CLOSING_TAG_HTML, 
-                                                         pdfStyleContent, totalPages);
+                    nextPageHeight = await getPageHeight(docHtmlContent + nextPageContent.join('') + "</div>" + CLOSING_TAG_HTML, 
+                                                         docStyleContent, totalPages);
                     if(nextPageHeight > PAGE_DEFAULT_HEIGHT){
                         currentPageContent = nextPageContent;
                         nextPageContent = [];
                         currentPageHeight = nextPageHeight;
                     }
                     else{
-                        pdfHtmlContent += nextPageContent.join('');
+                        docHtmlContent += nextPageContent.join('');
                     }
                 }
             }
@@ -224,11 +224,11 @@ module.exports = {
             }catch{}
         }
         else{   
-            pdfHtmlContent += textMessage.join('');
+            docHtmlContent += textMessage.join('');
         }
 
         // Updates the rest of the module and the document
-        module.exports.pdfHtmlContent = pdfHtmlContent;
+        module.exports.docHtmlContent = docHtmlContent;
         module.exports.pageSelected = totalPages;
         if(pageInstances.length - 1 > currentInstance){
             pageInstances.splice(currentInstance + 1);
@@ -238,17 +238,17 @@ module.exports = {
         }else{
             currentInstance++;
         }
-        pageInstances.push([pdfHtmlContent, totalPages]);
-        await mountDocument(pdfHtmlContent, pdfStyleContent);
+        pageInstances.push([docHtmlContent, totalPages]);
+        await mountDocument(docHtmlContent, docStyleContent);
         
     },
 
     async undoAddition(){
         if(currentInstance > 0){
             currentInstance--;
-            module.exports.pdfHtmlContent = pageInstances[currentInstance][0];
+            module.exports.docHtmlContent = pageInstances[currentInstance][0];
             module.exports.selectedPage = pageInstances[currentInstance][1];
-            await mountDocument(module.exports.pdfHtmlContent, module.exports.pdfStyleContent);
+            await mountDocument(module.exports.docHtmlContent, module.exports.docStyleContent);
             return true;
         }
         return false;
@@ -257,9 +257,9 @@ module.exports = {
     async redoAddition(){
         if(currentInstance != 19 && pageInstances.length > currentInstance + 1){
             currentInstance++;
-            module.exports.pdfHtmlContent = pageInstances[currentInstance][0];
+            module.exports.docHtmlContent = pageInstances[currentInstance][0];
             module.exports.selectedPage = pageInstances[currentInstance][1];
-            await mountDocument(module.exports.pdfHtmlContent, module.exports.pdfStyleContent);
+            await mountDocument(module.exports.docHtmlContent, module.exports.docStyleContent);
             return true;
         }
         return false;

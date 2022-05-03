@@ -5,7 +5,7 @@ const path = require('path');
 const { validateHTMLColorName, validateHTMLColorHex } = require('validate-color');
 
 // pdfStyle methods
-const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 module.exports = {
     data: {
@@ -28,7 +28,7 @@ module.exports = {
         newFontColor = await setStyleObjProperty("fontColor", newFontColor);
 
         // Checks if a document is already in the making
-		const { mounting } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		if(!mounting){
 			startMount();
 		}

@@ -8,7 +8,7 @@ const { MessageSelectMenu } = require('discord.js');
 const sanitize = require('sanitize-filename');
 
 // pdfStyle methods
-const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
 const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`)
@@ -18,7 +18,7 @@ module.exports = {
 	data: {
 		name: 'onepagepdf',
 		params: ['<file_name>'],
-		description: "Generates a one-page PDF file using the user's last text message"
+		description: "Generates a single page PDF file using the user's last text message"
 	},
 	async execute(messageSent, parameters){
 		
@@ -52,7 +52,7 @@ module.exports = {
 		senderLastMessage = senderMessages.at(1).content;
 		startMount();
 		await addContent(senderLastMessage, currentChannel);
-		const { totalPages } = require(`..${path.sep}instances${path.sep}pdfStyle`);
+		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 		// Creates select menu
 		const pageSelectMenu = new MessageSelectMenu({

@@ -1,14 +1,14 @@
 {
-  "name": "pdfmaker",
+  "name": "docwriter",
   "version": "1.0.0",
-  "description": "Discord bot that transforms text messages into pdf files",
+  "description": "Discord bot that transforms text messages into document files",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HenriBDev/PDFMaker.git"
+    "url": "git+https://github.com/HenriBDev/DocWriter.git"
   },
   "keywords": [
     "text",
@@ -19,9 +19,9 @@
   "author": "HenriBDev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/HenriBDev/PDFMaker/issues"
+    "url": "https://github.com/HenriBDev/DocWriter/issues"
   },
-  "homepage": "https://github.com/HenriBDev/PDFMaker#readme",
+  "homepage": "https://github.com/HenriBDev/DocWriter#readme",
   "devDependencies": {
     "eslint": "^8.10.0",
     "nodemon": "^2.0.15"
