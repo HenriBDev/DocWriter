@@ -10,7 +10,7 @@ module.exports = {
     document: null,
 
     async launchChromium(){
-        module.exports.browser = await puppeteer.launch();
+        module.exports.browser = await puppeteer.launch({ args: ['--no-sandbox']});
         module.exports.document = await module.exports.browser.newPage();
         await module.exports.document.exposeFunction("convertToPixels", convertToPixels);
     },
