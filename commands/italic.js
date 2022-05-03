@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'italic',
         params: [null],
-        description: "Toggles italic on the current font"
+        description: "Toggles italic on the current font",
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 

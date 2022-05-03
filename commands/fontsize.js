@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'fontsize',
         params: ['<font_size>'],
-        description: "Changes the font's current size (measured in PTs)"
+        description: "Changes the font's current size (measured in PTs)",
+        type: "formatting"
     },
     async execute(messageSent, parameters){
 

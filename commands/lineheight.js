@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'lineheight',
         params: ['<line_height>'],
-        description: "Changes the lines' height (measured in centimeters)"
+        description: "Changes the lines' height (measured in centimeters)",
+        type: "formatting"
     },
     async execute(messageSent, parameters){
 

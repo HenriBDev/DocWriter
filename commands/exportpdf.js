@@ -1,9 +1,6 @@
 // Node modules
 const path = require('path');
 
-// Discord.js' select menu
-const { MessageSelectMenu } = require('discord.js');
-
 // pdfStyle methods
 const { finishMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
@@ -15,7 +12,8 @@ module.exports = {
     data: {
         name: 'exportpdf',
         params: ['<file_name>'],
-        description: "Finishes mounting the document and export it as PDF"
+        description: "Finishes mounting the document and export it as PDF",
+		type: "utility"
     },
     async execute(messageSent, parameters){
 
@@ -28,20 +26,7 @@ module.exports = {
 			// User didn't specify a name for the file
 			return await currentChannel.send("Please choose a name for the file!");
 		}
-		fileName = sanitize(fileName)
-
-		// Creates select menu
-		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
-		const pageSelectMenu = new MessageSelectMenu({
-			customId: "select_menu"
-		});
-		for(let page = 1; page <= totalPages; page++){
-			pageSelectMenu.addOptions({
-				label: `Page ${page}/${totalPages}`,
-				value: `${page}`,
-				default: page == totalPages ? true : false
-			});
-		}
+		fileName = sanitize(fileName);
 
 		// Creates PDF file and Responds command
 		const pdfFile = await finishMount();

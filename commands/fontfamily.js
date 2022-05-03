@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'fontfamily',
         params: ['<font_family>'],
-        description: "Changes the current font family"
+        description: "Changes the current font family",
+        type: "formatting"
     },
     async execute(messageSent, parameters){
 

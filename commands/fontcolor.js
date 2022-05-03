@@ -11,7 +11,8 @@ module.exports = {
     data: {
         name: 'fontcolor',
         params: ['<font_color>'],
-        description: "Changes the font color (`<font_color>` can be a name or a hex code, ex: `#E0E0E0` or `lightblue`)"
+        description: "Changes the font color (`<font_color>` can be a name or a hex code, ex: `#E0E0E0` or `lightblue`)",
+        type: "formatting"
     },
     async execute(messageSent, parameters){
 

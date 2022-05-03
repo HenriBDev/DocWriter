@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'underline',
         params: [null],
-        description: "Toggles underline on the current font"
+        description: "Toggles underline on the current font",
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 

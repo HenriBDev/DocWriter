@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'bold',
         params: [null],
-        description: "Toggles bold on the current font"
+        description: "Toggles bold on the current font",
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 

@@ -1,9 +1,6 @@
 // Node modules
 const path = require('path');
 
-// Discord.js' select menu
-const { MessageSelectMenu } = require('discord.js');
-
 // Filename sanitizer
 const sanitize = require('sanitize-filename');
 
@@ -18,7 +15,8 @@ module.exports = {
 	data: {
 		name: 'onepagepdf',
 		params: ['<file_name>'],
-		description: "Generates a single page PDF file using the user's last text message"
+		description: "Generates a single page PDF file using the user's last text message",
+		type: "utility"
 	},
 	async execute(messageSent, parameters){
 		
@@ -54,18 +52,6 @@ module.exports = {
 		await addContent(senderLastMessage, currentChannel);
 		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 
-		// Creates select menu
-		const pageSelectMenu = new MessageSelectMenu({
-			customId: "select_menu"
-		});
-		for(let page = 1; page <= totalPages; page++){
-			pageSelectMenu.addOptions({
-				label: `Page ${page}/${totalPages}`,
-				value: `${page}`,
-				default: page == totalPages ? true : false
-			});
-		}
-
 		// Creates PDF and preview files and responds command
 		const pdfFile = await finishMount();
 		const previewFile = await getPagePreview(totalPages);
@@ -77,30 +63,11 @@ module.exports = {
 		]});
 		return await currentChannel.send(
 			{
-				content: "Pages preview:", 
+				content: "Page preview:", 
 				files: [{
 					name: "preview.png",
 					attachment: previewFile
-				}],
-				components: [{
-					type: 1,
-					components: [{
-						type: 2,
-						label: "◀️",
-						customId: "backward_button",
-						style: "PRIMARY"
-					},
-					{
-						type: 2,
-						label: "▶️",
-						customId: "forward_button",
-						style: "PRIMARY"
-					}]
-				},
-				{
-					type: 1,
-					components: [pageSelectMenu]
-				}]	
+				}]
 			}
 		);
 	}

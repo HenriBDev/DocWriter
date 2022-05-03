@@ -14,7 +14,8 @@ module.exports = {
     data: {
         name: 'setmargins',
         params: ['<margin_top/.>','<margin_right/.>','<margin_bottom/.>','<margin_left/.>'],
-        description: "Changes the margin measurements (use `.` if you don't want to change, example: `" + PREFIX + "setmargins . . 3 .` -> will set margin-bottom to 3cm)"
+        description: "Changes the margin measurements (use `.` if you don't want to change, example: `" + PREFIX + "setmargins . . 3 .` -> will set margin-bottom to 3cm)",
+        type: "formatting"
     },
     async execute(messageSent, parameters){
 

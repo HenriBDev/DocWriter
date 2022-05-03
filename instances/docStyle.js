@@ -263,6 +263,10 @@ module.exports = {
             return true;
         }
         return false;
+    },
+
+    selectPage(page){
+        module.exports.pageSelected = page;
     }
     
 }

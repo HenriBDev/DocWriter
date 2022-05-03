@@ -14,7 +14,8 @@ module.exports = {
     data: {
         name: 'addcontent',
         params: [null],
-        description: "Adds last message to the document without finishing the mounting"
+        description: "Adds last message to the document without finishing the mounting",
+		type: "utility"
     },
     async execute(messageSent, parameters = null){
 
@@ -49,7 +50,7 @@ module.exports = {
 		// Creates select menu
 		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 		const pageSelectMenu = new MessageSelectMenu({
-			customId: "select_menu"
+			customId: "selectPage_Menu"
 		});
 		for(let page = 1; page <= totalPages; page++){
 			pageSelectMenu.addOptions({
@@ -73,13 +74,13 @@ module.exports = {
 					components: [{
 						type: 2,
 						label: "◀️",
-						customId: "backward_button",
+						customId: "selectPage_Previous",
 						style: "PRIMARY"
 					},
 					{
 						type: 2,
 						label: "▶️",
-						customId: "forward_button",
+						customId: "selectPage_Next",
 						style: "PRIMARY"
 					}]
 				},

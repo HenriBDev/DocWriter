@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'align',
         params: ['<right/left/center/justify>'],
-        description: "Changes the content's alignment"
+        description: "Changes the content's alignment",
+        type: "formatting"
     },
     async execute(messageSent, parameters){
 

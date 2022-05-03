@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'superscript',
         params: [null],
-        description: "Toggles superscript on the current font"
+        description: "Toggles superscript on the current font",
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 

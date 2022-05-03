@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'subscript',
         params: [null],
-        description: "Toggles subscript on the current font"
+        description: "Toggles subscript on the current font",
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 

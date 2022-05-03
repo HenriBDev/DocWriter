@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'firstlineindent',
         params: ['<line_indent/nothing>'],
-        description: "Changes/disables the indentation before the first line (measured in centimeters)"
+        description: "Changes/disables the indentation before the first line (measured in centimeters)",
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 

@@ -8,7 +8,8 @@ module.exports = {
     data: {
         name: 'dashed',
         params: ["<double/nothing>"],
-        description: 'Toggles dashed or double dashed on the current font, add "double" as a parameter to toggle double dashed'
+        description: 'Toggles dashed or double dashed on the current font, add "double" as a parameter to toggle double dashed',
+        type: "formatting"
     },
     async execute(messageSent, parameters = null){
 
