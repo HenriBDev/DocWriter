@@ -4,7 +4,8 @@
   "description": "Discord bot that transforms text messages into document files",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "start:dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -34,5 +35,8 @@
     "puppeteer": "^13.4.0",
     "sanitize-filename": "^1.6.3",
     "validate-color": "^2.2.1"
+  },
+  "engines": {
+    "node": "16.14.0"
   }
 }
