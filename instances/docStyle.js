@@ -35,7 +35,7 @@ module.exports = {
         paddingBottom: "2.5cm",
         paddingLeft: "3cm",
         paddingRight: "3cm",
-        fontFamily: 'calibri',
+        fontFamily: 'Times New Roman',
         fontBold: false,
         fontItalic: false,
         fontDashed: false,
