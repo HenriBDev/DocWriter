@@ -1,5 +1,6 @@
 // Node modules
 const path = require('path');
+const fs = require('fs');
 
 // Text Parser
 const { toHTML } = require('discord-markdown');
@@ -20,7 +21,8 @@ const OPENING_TAG_HTML = "<!DOCTYPE html><html><body>",
 
 // Default page and paragraph settings on CSS
 const DEFAULT_PAGE = '.page{overflow-wrap: anywhere;}',
-      DEFAULT_PARAGRAPH = '.paragraph{display: flex}';
+      DEFAULT_PARAGRAPH = '.paragraph{display: flex}',
+      CUSTOM_FONTS = '@font-face{font-family: "Times New Roman";src: url("data:font/ttf;base64,' + fs.readFileSync(`..${path.sep}fonts${path.sep}times.ttf`).toString('base64') + '";}';
 
 // Page content instances
 let pageInstances = [],
@@ -70,7 +72,7 @@ module.exports = {
     },
 
     docHtmlContent: null,
-    docStyleContent: RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH,
+    docStyleContent: RESET_CSS + DEFAULT_PAGE + DEFAULT_PARAGRAPH + CUSTOM_FONTS,
     mounting: false,
     totalPages: 1,
     pageSelected: 1, 
