@@ -19,13 +19,19 @@ module.exports = {
 
 		// Gets the discord message's data
 		const currentChannel = messageSent.channel;
-		let fileName = parameters[0];
 
-		// Validates the name of the file
-		if(!fileName){
+		// Checks if there are parameters on the message
+		let fileName;
+		if(parameters){
+			fileName = parameters[0];
+		}
+		else{
 			// User didn't specify a name for the file
 			return await currentChannel.send("Please choose a name for the file!");
 		}
+		
+
+		// Validates the name of the file
 		fileName = sanitize(fileName);
 
 		// Creates PDF file and Responds command
