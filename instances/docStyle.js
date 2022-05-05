@@ -1,6 +1,5 @@
 // Node modules
 const path = require('path');
-const fs = require('fs');
 
 // Text Parser
 const { toHTML } = require('discord-markdown');
@@ -16,7 +15,8 @@ const PAGE_DEFAULT_WIDTH =  793.5;
 const RESET_CSS = "/* http://meyerweb.com/eric/tools/css/reset/ v2.0 (public domain)*/html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, img, ins, kbd, q, s, samp,small, strike, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body {line-height: 1;}ol, ul {list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after,q:before, q:after {content: '';content: none;}table {border-collapse: collapse;border-spacing: 0;}";
 
 // Default html5 opening and closing tags
-const OPENING_TAG_HTML = "<!DOCTYPE html><html><body>",
+const OPENING_TAG_HTML = "<!DOCTYPE html><html><body>" +
+                         '<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">',
       CLOSING_TAG_HTML = "</body></html>";
 
 // Default page and paragraph settings on CSS
@@ -34,7 +34,7 @@ module.exports = {
         paddingBottom: "2.5cm",
         paddingLeft: "3cm",
         paddingRight: "3cm",
-        fontFamily: 'Times New Roman',
+        fontFamily: 'Roboto',
         fontBold: false,
         fontItalic: false,
         fontDashed: false,
