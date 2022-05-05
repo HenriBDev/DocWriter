@@ -1,5 +1,6 @@
 // Node modules
 const path = require('path');
+const fs = require('fs');
 
 // Text Parser
 const { toHTML } = require('discord-markdown');
