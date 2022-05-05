@@ -15,6 +15,10 @@ module.exports = {
         await module.exports.document.exposeFunction("convertToPixels", convertToPixels);
     },
 
+    async closeChromium(){
+        await module.exports.browser.close();
+    },
+
     async getPageHeight(htmlContent, styleContent, pageNumber){
         await module.exports.mountDocument(htmlContent, styleContent);
         return await module.exports.document.$eval(`#page${pageNumber}`, page => page.getBoundingClientRect().height);
@@ -41,7 +45,7 @@ module.exports = {
             if(property == "font-family"){
                 let fontSize = window.getComputedStyle(testText).getPropertyValue("font-size");
                 if(!document.fonts.check(`${fontSize} ${propertyValue}`)){
-                    propertyValue = "Times New Roman";
+                    propertyValue = "sans";
                     testText.style['font-family'] = propertyValue;
                 }
             }

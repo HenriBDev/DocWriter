@@ -8,7 +8,7 @@ const { MessageSelectMenu } = require('discord.js');
 const { startMount, addContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
+const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
     data: {
@@ -45,6 +45,7 @@ module.exports = {
 
 		// Adds text to document
 		senderLastMessage = senderMessages.at(1).content;
+		await launchChromium();
 		await addContent(senderLastMessage, currentChannel);
 
 		// Creates select menu
@@ -62,6 +63,7 @@ module.exports = {
 
 		// Creates file preview and responds command
 		const previewFile = await getPagePreview(totalPages);
+		await closeChromium();
 		return await currentChannel.send(
 			{
 				content: "Pages preview:", 

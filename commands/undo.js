@@ -5,7 +5,7 @@ const path = require('path');
 const { undoAddition } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser methods
-const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
+const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 // Discord.js' select menu
 const { MessageSelectMenu } = require('discord.js');
@@ -23,6 +23,7 @@ module.exports = {
         const currentChannel = messageSent.channel; 
 
         // Undoes latest addition
+		await launchChromium();
         if(!await undoAddition()){
             return currentChannel.send("Undo limit reached.");
         }
@@ -42,6 +43,7 @@ module.exports = {
 
 		// Creates file preview and responds command
 		const previewFile = await getPagePreview(totalPages);
+		await closeChromium();
 		return await currentChannel.send(
 			{
 				content: "Pages preview:", 

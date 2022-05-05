@@ -8,7 +8,7 @@ const { MessageSelectMenu } = require('discord.js');
 const { selectPage } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`);
+const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
 	data: {
@@ -74,7 +74,9 @@ module.exports = {
         selectPage(newPageSelection);
 
         // Creates preview file and responds interaction
+        launchChromium();
         const previewFile = await getPagePreview(newPageSelection);
+        closeChromium();
         messageOptions.files = [{
             name: "preview.png",
             attachment: previewFile
