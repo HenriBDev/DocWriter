@@ -8,7 +8,7 @@ const { PREFIX } = require(`..${path.sep}instances${path.sep}client`);
 const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // browser methods
-const { setPageMarginLength, mountDocument } = require(`..${path.sep}instances${path.sep}browser`);
+const { launchChromium, setPageMarginLength, mountDocument, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
     data: {
@@ -28,6 +28,7 @@ module.exports = {
         }else{
             let marginDimension;
             // Checks if a document is already in the making
+            await launchChromium();
 		    const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		    if(!mounting){
 			    startMount();
@@ -61,6 +62,7 @@ module.exports = {
                     }
                 }
             }
+            await closeChromium();
             return await currentChannel.send("Current margin dimensions' length:\n\n" + 
                                              `Margin-top: **${getStyleObjProperty("paddingTop")}**\n` +
                                              `Margin-right: **${getStyleObjProperty("paddingRight")}**\n` + 

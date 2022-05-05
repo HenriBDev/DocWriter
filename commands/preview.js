@@ -5,7 +5,7 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // Browser interactions
-const { getPagePreview, mountDocument } = require(`..${path.sep}instances${path.sep}browser`);
+const { launchChromium, getPagePreview, mountDocument, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 // pdfStyle methods
 const { startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
@@ -43,8 +43,10 @@ module.exports = {
 
 		// Creates file preview and responds command
         const { docHtmlContent, docStyleContent } = require(`..${path.sep}instances${path.sep}docStyle`);
-        await mountDocument(docHtmlContent, docStyleContent);
+        await launchChromium();
+		await mountDocument(docHtmlContent, docStyleContent);
 		const previewFile = await getPagePreview(totalPages);
+		await closeChromium();
 		return await currentChannel.send(
 			{
 				content: "Pages preview:", 

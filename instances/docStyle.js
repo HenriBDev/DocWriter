@@ -1,5 +1,6 @@
 // Node modules
 const path = require('path');
+const fs = require('fs');
 
 // Text Parser
 const { toHTML } = require('discord-markdown');
@@ -33,7 +34,7 @@ module.exports = {
         paddingBottom: "2.5cm",
         paddingLeft: "3cm",
         paddingRight: "3cm",
-        fontFamily: 'calibri',
+        fontFamily: 'Times New Roman',
         fontBold: false,
         fontItalic: false,
         fontDashed: false,

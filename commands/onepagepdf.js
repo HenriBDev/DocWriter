@@ -8,7 +8,7 @@ const sanitize = require('sanitize-filename');
 const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { getPagePreview } = require(`..${path.sep}instances${path.sep}browser`)
+const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`)
 
 // Event
 module.exports = {
@@ -49,12 +49,14 @@ module.exports = {
 		// Mounts document with the sent message
 		senderLastMessage = senderMessages.at(1).content;
 		startMount();
+		await launchChromium();
 		await addContent(senderLastMessage, currentChannel);
 		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 		// Creates PDF and preview files and responds command
 		const pdfFile = await finishMount();
 		const previewFile = await getPagePreview(totalPages);
+		await closeChromium();
 		await currentChannel.send({files:[
 			{
 				name: fileName + ".pdf", 
