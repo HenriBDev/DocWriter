@@ -5,10 +5,10 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // Browser interactions
-const { launchChromium, getPagePreview, mountDocument, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { closeChromium, getPagePreview, mountDocument } = require(`..${path.sep}instances${path.sep}browser`);
 
 // pdfStyle methods
-const { startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { startMount, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 module.exports = {
     data: {
@@ -43,7 +43,7 @@ module.exports = {
 
 		// Creates file preview and responds command
         const { docHtmlContent, docStyleContent } = require(`..${path.sep}instances${path.sep}docStyle`);
-        await launchChromium();
+        await reloadBrowserContent();
 		await mountDocument(docHtmlContent, docStyleContent);
 		const previewFile = await getPagePreview(totalPages);
 		await closeChromium();

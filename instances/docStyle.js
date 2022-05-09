@@ -6,7 +6,7 @@ const fs = require('fs');
 const { toHTML } = require('discord-markdown');
 
 // Browser interactions
-const { getPageHeight, getPdfFile, mountDocument, getParagraphStyleProperty } = require(`.${path.sep}browser`);
+const { getPageHeight, getPdfFile, mountDocument, getParagraphStyleProperty, launchChromium } = require(`.${path.sep}browser`);
 
 // Page (A4 paper) height and width in pixels (96 dpi)
 const PAGE_DEFAULT_HEIGHT = 1122.5;
@@ -100,6 +100,10 @@ module.exports = {
         module.exports.mounting = false;
         return await getPdfFile(module.exports.docHtmlContent, module.exports.docStyleContent, module.exports.totalPages);
 
+    },
+
+    async reloadBrowserContent(){
+        await launchChromium(module.exports.docHtmlContent, module.exports.docStyleContent);
     },
 
     async addContent(textMessage, discordChannel){

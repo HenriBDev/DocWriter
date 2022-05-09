@@ -5,10 +5,10 @@ const path = require('path');
 const sanitize = require('sanitize-filename');
 
 // pdfStyle methods
-const { startMount, addContent, finishMount } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { startMount, addContent, finishMount, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`)
+const { closeChromium, getPagePreview } = require(`..${path.sep}instances${path.sep}browser`)
 
 // Event
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
 		// Mounts document with the sent message
 		senderLastMessage = senderMessages.at(1).content;
 		startMount();
-		await launchChromium();
+		await reloadBrowserContent();
 		await addContent(senderLastMessage, currentChannel);
 		const { totalPages } = require(`..${path.sep}instances${path.sep}docStyle`);
 

@@ -5,10 +5,10 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // pdfStyle methods
-const { selectPage } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { selectPage, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
 	data: {
@@ -52,13 +52,13 @@ module.exports = {
                 components: [{
                     type: 2,
                     label: "◀️",
-                    customId: "selectPagePrevious",
+                    customId: "selectPage_Previous",
                     style: "PRIMARY"
                 },
                 {
                     type: 2,
                     label: "▶️",
-                    customId: "selectPageNext",
+                    customId: "selectPage_Next",
                     style: "PRIMARY"
                 }]
             },
@@ -74,9 +74,9 @@ module.exports = {
         selectPage(newPageSelection);
 
         // Creates preview file and responds interaction
-        launchChromium();
+        await reloadBrowserContent();
         const previewFile = await getPagePreview(newPageSelection);
-        closeChromium();
+        await closeChromium();
         messageOptions.files = [{
             name: "preview.png",
             attachment: previewFile

@@ -5,10 +5,10 @@ const path = require('path');
 const { MessageSelectMenu } = require('discord.js');
 
 // pdfStyle methods
-const { startMount, addContent } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { startMount, addContent, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
     data: {
@@ -45,7 +45,7 @@ module.exports = {
 
 		// Adds text to document
 		senderLastMessage = senderMessages.at(1).content;
-		await launchChromium();
+		await reloadBrowserContent();
 		await addContent(senderLastMessage, currentChannel);
 
 		// Creates select menu

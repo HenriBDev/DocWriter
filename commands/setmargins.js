@@ -5,10 +5,10 @@ const path = require('path');
 const { PREFIX } = require(`..${path.sep}instances${path.sep}client`);
 
 // pdfStyle methods
-const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { setStyleObjProperty, getStyleObjProperty, startMount, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // browser methods
-const { launchChromium, setPageMarginLength, mountDocument, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { closeChromium, setPageMarginLength, mountDocument } = require(`..${path.sep}instances${path.sep}browser`);
 
 module.exports = {
     data: {
@@ -28,7 +28,7 @@ module.exports = {
         }else{
             let marginDimension;
             // Checks if a document is already in the making
-            await launchChromium();
+            await reloadBrowserContent();
 		    const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		    if(!mounting){
 			    startMount();

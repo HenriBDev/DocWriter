@@ -9,10 +9,11 @@ module.exports = {
     browser: null,
     document: null,
 
-    async launchChromium(){
+    async launchChromium(htmlContent, styleContent){
         module.exports.browser = await puppeteer.launch({ args: ['--no-sandbox']});
         module.exports.document = await module.exports.browser.newPage();
         await module.exports.document.exposeFunction("convertToPixels", convertToPixels);
+        await module.exports.mountDocument(htmlContent, styleContent);
     },
 
     async closeChromium(){
@@ -43,6 +44,7 @@ module.exports = {
         return await module.exports.document.$eval(`#paragraph${paragraphId}`, (testText, property) => {
             let propertyValue = window.getComputedStyle(testText).getPropertyValue(property);
             if(property == "font-family"){
+                if(propertyValue.includes('"')) propertyValue = propertyValue.split('"')[1];
                 let fontSize = window.getComputedStyle(testText).getPropertyValue("font-size");
                 if(!document.fonts.check(`${fontSize} ${propertyValue}`)){
                     propertyValue = "sans";

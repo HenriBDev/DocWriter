@@ -2,10 +2,10 @@
 const path = require('path');
 
 // pdfStyle methods
-const { redoAddition } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { redoAddition, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser methods
-const { launchChromium, getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { getPagePreview, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 // Discord.js' select menu
 const { MessageSelectMenu } = require('discord.js');
@@ -23,7 +23,7 @@ module.exports = {
         const currentChannel = messageSent.channel; 
 
         // Redoes latest addition
-		await launchChromium();
+		await reloadBrowserContent();
         if(!await redoAddition()){
             return currentChannel.send("Redo limit reached.");
         }
