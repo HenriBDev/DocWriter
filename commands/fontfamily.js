@@ -2,10 +2,10 @@
 const path = require('path');
 
 // pdfStyle methods
-const { setStyleObjProperty, getStyleObjProperty, startMount } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { setStyleObjProperty, getStyleObjProperty, startMount, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
-const { launchChromium, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 
 module.exports = {
@@ -27,7 +27,7 @@ module.exports = {
 
         // Sets new font family
         let newFontFamily = parameters.join(' ');
-        await launchChromium();
+        await reloadBrowserContent();
         newFontFamily = await setStyleObjProperty("fontFamily", newFontFamily);
         await closeChromium();
 

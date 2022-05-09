@@ -2,10 +2,10 @@
 const path = require('path');
 
 // pdfStyle methods
-const { finishMount } = require(`..${path.sep}instances${path.sep}docStyle`);
+const { finishMount, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser insteractions
-const { launchChromium, closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
+const { closeChromium } = require(`..${path.sep}instances${path.sep}browser`);
 
 // Filename sanitizer
 const sanitize = require('sanitize-filename');
@@ -38,7 +38,7 @@ module.exports = {
 		fileName = sanitize(fileName);
 
 		// Creates PDF file and Responds command
-		await launchChromium();
+		await reloadBrowserContent();
 		const pdfFile = await finishMount();
 		await closeChromium();
 		await currentChannel.send({files:[
