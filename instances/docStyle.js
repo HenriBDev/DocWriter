@@ -6,7 +6,7 @@ const fs = require('fs');
 const { toHTML } = require('discord-markdown');
 
 // Browser interactions
-const { getPageHeight, getPdfFile, mountDocument, getParagraphStyleProperty, launchChromium } = require(`.${path.sep}browser`);
+const { getPageHeight, getPdfFile, mountDocument, launchChromium } = require(`.${path.sep}browser`);
 
 // Page (A4 paper) height and width in pixels (96 dpi)
 const PAGE_DEFAULT_HEIGHT = 1122.5;
@@ -16,9 +16,8 @@ const PAGE_DEFAULT_WIDTH =  793.5;
 const RESET_CSS = "/* http://meyerweb.com/eric/tools/css/reset/ v2.0 (public domain)*/html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, img, ins, kbd, q, s, samp,small, strike, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body {line-height: 1;}ol, ul {list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after,q:before, q:after {content: '';content: none;}table {border-collapse: collapse;border-spacing: 0;}";
 
 // Default html5 opening and closing tags
-const OPENING_TAG_HTML = "<!DOCTYPE html><html><body>" +
-                         '<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">',
-      CLOSING_TAG_HTML = "</body></html>";
+const OPENING_TAG_HTML = '<!DOCTYPE html><html><body>',
+      CLOSING_TAG_HTML = "</body></html>";      
 
 // Default page and paragraph settings on CSS
 const DEFAULT_PAGE = '.page{overflow-wrap: anywhere;}',
@@ -28,6 +27,34 @@ const DEFAULT_PAGE = '.page{overflow-wrap: anywhere;}',
 let pageInstances = [],
     currentInstance = 0;
 
+// Google Web Fonts link
+let fonts = [
+    'antic slab',      'archivo black',    'bangers',
+    'barlow',          'bebas neue',       'bungee shade',
+    'courgette',       'creepster',        'fraunces',
+    'fredoka one',     'gloria hallelujah','grenze gotisch',
+    'gugi',            'inconsolata',      'kaushan script',
+    'lobster two',     'macondo',          'merriweather',
+    'monoton',         'montserrat',       'noto sans',
+    'noto serif',      'open sans',        'orbitron',         
+    'ovo',             'playfair display', 'quicksand',       
+    'raleway dots',    'roboto',           'roboto condensed',
+    'roboto flex',     'roboto mono',      'roboto serif',    
+    'roboto slab',     'rye',              'sacramento',      
+    'source sans pro', 'space mono',       'ubuntu',          
+    'ubuntu mono',     'ultra',            'wallpoet'
+]
+let GOOGLE_WEB_FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+                       '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+                       '<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=';
+fonts.forEach((fontFamily, index) => {
+    fontFamily = fontFamily.split(' ');
+    fontFamily = fontFamily.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    fontFamily = fontFamily.join(' ');
+    GOOGLE_WEB_FONTS += fontFamily.replace(/\s+/g,"+") + (index == fonts.length - 1 ? "" : "|");
+});
+GOOGLE_WEB_FONTS += '">';
+
 module.exports = {
 
     style: {
@@ -35,7 +62,7 @@ module.exports = {
         paddingBottom: "2.5cm",
         paddingLeft: "3cm",
         paddingRight: "3cm",
-        fontFamily: 'Roboto',
+        fontFamily: 'roboto',
         fontBold: false,
         fontItalic: false,
         fontDashed: false,
@@ -50,20 +77,11 @@ module.exports = {
         paragraphLinesHeight: "0.5cm",
         paragraphFirstLineIndentation: "0cm"
     },
+    
+    fonts: fonts,
 
     async setStyleObjProperty(property, value){
         module.exports.style[property] = value;
-
-        // If it's an invalid font family, sets it to "Times New Roman"
-        if(property == "fontFamily"){
-            await mountDocument(OPENING_TAG_HTML + '<div><div id="paragraphTest">test', 
-                "#paragraphTest{" +
-                    `font-family: ${value};` +
-                "}"
-            );
-            module.exports.style[property] = await getParagraphStyleProperty("font-family", "Test");
-        }
-        
         return module.exports.style[property];
     },
 
@@ -81,7 +99,7 @@ module.exports = {
 
         const styleObject = module.exports.style;
         module.exports.docHtmlContent = (
-            OPENING_TAG_HTML +   
+            OPENING_TAG_HTML + GOOGLE_WEB_FONTS + 
             '<div class="page" id="page1" style="'+ 
                                                 `padding: ${convertToPixels(styleObject.paddingTop)}px ${convertToPixels(styleObject.paddingRight)}px ${convertToPixels(styleObject.paddingBottom)}px ${convertToPixels(styleObject.paddingLeft)}px; ` +
                                                 `min-height: ${PAGE_DEFAULT_HEIGHT - (convertToPixels(styleObject.paddingTop) + convertToPixels(styleObject.paddingBottom))}px; ` + 
