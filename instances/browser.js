@@ -40,21 +40,6 @@ module.exports = {
         await module.exports.document.addStyleTag({content: styleContent});
     },
 
-    async getParagraphStyleProperty(property, paragraphId){
-        return await module.exports.document.$eval(`#paragraph${paragraphId}`, (testText, property) => {
-            let propertyValue = window.getComputedStyle(testText).getPropertyValue(property);
-            if(property == "font-family"){
-                if(propertyValue.includes('"')) propertyValue = propertyValue.split('"')[1];
-                let fontSize = window.getComputedStyle(testText).getPropertyValue("font-size");
-                if(!document.fonts.check(`${fontSize} ${propertyValue}`)){
-                    propertyValue = "sans";
-                    testText.style['font-family'] = propertyValue;
-                }
-            }
-            return propertyValue;
-        }, property);
-    },
-
     async setPageMarginLength(pageId, marginDimension, value){
         await module.exports.document.$eval(`#page${pageId}`, async (page, marginDimension, value, PAGE_DEFAULT_HEIGHT, PAGE_DEFAULT_WIDTH) => {
             page.style[marginDimension] = await convertToPixels(value) + "px";

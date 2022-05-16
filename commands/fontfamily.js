@@ -1,7 +1,7 @@
 // Node modules
 const path = require('path');
 
-// pdfStyle methods
+// docStyle methods
 const { setStyleObjProperty, getStyleObjProperty, startMount, reloadBrowserContent } = require(`..${path.sep}instances${path.sep}docStyle`);
 
 // Browser interactions
@@ -25,17 +25,23 @@ module.exports = {
             return await currentChannel.send("Please select a font family!");
         }
 
-        // Sets new font family
-        let newFontFamily = parameters.join(' ');
-        await reloadBrowserContent();
-        newFontFamily = await setStyleObjProperty("fontFamily", newFontFamily);
-        await closeChromium();
+        let newFontFamily = parameters.join(' ').toLowerCase();
+
+        // Verifies if font exists
+        const { fonts } = require(`..${path.sep}instances${path.sep}docStyle`);
+        if(fonts.indexOf(newFontFamily) == -1){
+            return await currentChannel.send("Please select a valid font family!\nTo see which fonts are available use `doc|fonts`");
+        }
 
         // Checks if a document is already in the making
 		const { mounting } = require(`..${path.sep}instances${path.sep}docStyle`);
 		if(!mounting){
 			startMount();
 		}
+        // Sets new font family
+        await reloadBrowserContent();
+        newFontFamily = await setStyleObjProperty("fontFamily", newFontFamily);
+        await closeChromium();
 
         // Responds command
 		return await currentChannel.send(`Font-family selected: **${getStyleObjProperty('fontFamily')}**`);
