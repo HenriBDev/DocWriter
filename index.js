@@ -5,7 +5,8 @@ const path = require('path');
 const { instantiateClient, BOT_TOKEN } = require(`.${path.sep}instances${path.sep}client`);
 const client = instantiateClient();
 
-(function launchBot(){
+(async function launchBot(){
     // Login to Discord with the bot token
-    client.login(BOT_TOKEN); 
+    await client.login(BOT_TOKEN); 
+    await client.user.setActivity("doc|help",{type: "PLAYING"});
 })();
