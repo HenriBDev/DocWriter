@@ -1,17 +1,14 @@
-![DocWriter](readmeFiles/document-3503099_960_720.png)
+<p align="center">
+    <img src="readmeFiles/document-3503099_960_720.png" alt="drawing" width="30%"/>
+</p>
 
-<center>
-<br>
+# <p align="center">DocWriter</p>
 
-<b style="font-family: monospace;font-size: 30pt">DocWriter
-</b>
+<p align="center">DocWriter is your Discord bot to help writing documents without needing to leave the app</p>
 
-### DocWriter is your Discord bot to help writing documents without needing to leave the app
+<hr><br>
 
-</center>
-<br><hr><br>
-
-# **README Translations**
+# README Translations
 
 <ul>
 
@@ -21,28 +18,24 @@
 
 <br><hr><br>
 
-# **How does it work?**
+# How does it work?
 
-### To use DocWriter you need to follow these simple steps:
+#### To use DocWriter you need to follow these simple steps:
 
 <ol>
+    <li>Invite DocWriter to your server (Currently unavailable, more on: [Self-Hosting DocWriter](#Self-Hosting-DocWriter))</li>
+    <li>Write a message that you want to add to your document</li>
+    <li>Use the command `doc|addcontent` to include the text on the document</li>
+    <li>Finish the document and generate a PDF file using the command `doc|exportpdf <your_file_name>`</li>
+</ol>
 
-### <li>Invite DocWriter to your server (Currently unavailable, more on: [Self-Hosting DocWriter](#Self-Hosting-DocWriter))</li>
-
-### <li>Write a message that you want to add to your document</li>
-
-### <li>Use the command `doc|addcontent` to include the text on the document</li>
-
-### <li>Finish the document and generate a PDF file using the command `doc|exportpdf <your_file_name>`</li></ol>
-
-<center> 
-
-![demonstration](readmeFiles/demonstration.gif)
-</center>
+<p align="center">
+    <img src="readmeFiles/demonstration.gif" alt="drawing" width="50%"/>
+</p>
 
 <br><hr><br>
 
-# **Commands**
+# Commands
 
 ### DocWriter has two sets of commands: Utility commands and Formatting commands:
 <br>
@@ -98,7 +91,7 @@
 
 <br><hr><br>
 
-# **Self-Hosting DocWriter**
+# Self-Hosting DocWriter
 
 ### Currently DocWriter isn't available publicly, however you can clone this repository and host your own DocWriter on your machine!
 
@@ -137,7 +130,7 @@
 
 <br><hr><br>
 
-# **License**
+# License
 
 <ul>
 
