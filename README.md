@@ -6,39 +6,32 @@
 
 <p align="center">DocWriter is your Discord bot to help writing documents without needing to leave the app</p>
 
-<hr><br>
+<hr>
 
 # README Translations
 
-<ul>
+* **[Português Brasileiro/Brazilian Portuguese](README_pt-BR.md)**
 
-### <li>[Português Brasileiro/Brazilian Portuguese](README_pt-BR.md)</li>
-
-</ul>
-
-<br><hr><br>
+<hr>
 
 # How does it work?
 
-#### To use DocWriter you need to follow these simple steps:
-
-<ol>
-    <li>Invite DocWriter to your server (Currently unavailable, more on: [Self-Hosting DocWriter](#Self-Hosting-DocWriter))</li>
-    <li>Write a message that you want to add to your document</li>
-    <li>Use the command `doc|addcontent` to include the text on the document</li>
-    <li>Finish the document and generate a PDF file using the command `doc|exportpdf <your_file_name>`</li>
-</ol>
+**To use DocWriter you need to follow these simple steps:**
+  
+1. Invite DocWriter to your server (Currently unavailable, more on: [Self-Hosting DocWriter](#self-hosting-docwriter))
+2. Write a message that you want to add to your document
+3. Use the command `doc|addcontent` to include the text on the document
+4. Finish the document and generate a PDF file using the command `doc|exportpdf <your_file_name>`
 
 <p align="center">
     <img src="readmeFiles/demonstration.gif" alt="drawing" width="50%"/>
 </p>
 
-<br><hr><br>
+<hr>
 
 # Commands
 
-### DocWriter has two sets of commands: Utility commands and Formatting commands:
-<br>
+DocWriter has two sets of commands: Utility commands and Formatting commands:
 
 ## Utility Commands
 **doc|addcontent** -> Adds last message to the document without finishing the mounting
@@ -89,51 +82,33 @@
 
 **doc|underline** -> Toggles underline on the current font
 
-<br><hr><br>
+<hr>
 
-# Self-Hosting DocWriter
+# <div id="self-hosting-docwriter">Self-Hosting DocWriter</div>
 
-### Currently DocWriter isn't available publicly, however you can clone this repository and host your own DocWriter on your machine!
+**Currently DocWriter isn't available publicly, however you can clone this repository and host your own DocWriter on your machine! You can do that by following these steps:**
 
-### You can do that by following these steps:
+1. Access the **[Discord's Developer Portal](https://discord.com/developers/applications)** and log in with your account
+2. Start a new application and give it a cool name, like: "DocWriter_Jr"
+3. Go to the "Bot" section and add a new bot to your application
+4. Clone this repository on your machine, preferably on an empty folder for better organization
+5. Go back to the "Bot" section on your application and generate a new token
+6. Create a ".env" file on the root of the repository and add inside it: `BOT_TOKEN="<generated_token>"`
+7. Now, invite your bot to your server by going to the "OAuth2" section and then "URL Generator", select the "bot" scope and include the following permissions:
+    * Read Messages/View Channels
+    * Send Messages
+    * Manage Messages
+    * Attach Files
+    * Read Message History
+8. Open the generated URL on your browser and invite your "DocWriter_Jr" to your server
+9. Make sure to have **[Node.js](https://nodejs.org/en/)** installed on your machine (you can see which version is installed by running `node --version` on your terminal, in case no version appears you should install it)
+10. Open a terminal inside the repository directory and run `npm start`
+11. Enjoy your own DocWriter now functional on your server! :tada: 
 
-<ol>
-
-### <li>Access the [Discord's Developer Portal](https://discord.com/developers/applications) and log in with your account</li>
-
-### <li>Start a new application and give it a cool name, like: "DocWriter_Jr"</li>
-
-### <li>Go to the "Bot" section and add a new bot to your application</li>
-
-### <li>Clone this repository on your machine, preferably on an empty folder for better organization</li>
-
-### <li>Go back to the "Bot" section on your application and generate a new token</li>
-
-### <li>Create a ".env" file on the root of the repository and add inside it: `BOT_TOKEN="<generated_token>"`</li>
-
-### <li>Now, invite your bot to your server by going to the "OAuth2" section and then "URL Generator", select the "bot" scope and include the following permissions:
-<ul>
-    <li>Read Messages/View Channels</li>
-    <li>Send Messages</li>
-    <li>Manage Messages</li>
-    <li>Attach Files</li>
-    <li>Read Message History</li>
-</ul>
-
-### Open the generated URL on your browser and invite your "DocWriter_Jr" to your server</li>
-
-### <li>Make sure to have [Node.js](https://nodejs.org/en/) installed on your machine (you can see which version is installed by running `node --version` on your terminal, in case no version appears you should install it)</li>
-
-### <li>Open a terminal inside the repository directory and run `npm start`</li>
-
-### <li>Enjoy your own DocWriter now functional on your server! :tada: </li>
-
-<br><hr><br>
+<hr>
 
 # License
 
-<ul>
+* **This project works under the [MIT License](LICENSE)**
 
-### <li>This project works under the [MIT License](LICENSE)</li>
-
-### <li>All fonts used by DocWriter are available on [Google Fonts](https://fonts.google.com)
+* **All fonts used by DocWriter are available on [Google Fonts](https://fonts.google.com)**
