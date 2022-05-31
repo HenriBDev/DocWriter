@@ -1,41 +1,31 @@
-![DocWriter](readmeFiles/document-3503099_960_720.png)
+<p align="center">
+    <img src="readmeFiles/document-3503099_960_720.png" alt="drawing" width="30%"/>
+</p>
 
-<center>
-<br>
+# <p align="center">DocWriter</p>
 
-<b style="font-family: monospace;font-size: 30pt">DocWriter
-</b>
+<p align="center"> DocWriter é o seu bot do Discord para ajudar a escrever documentos sem precisar sair do aplicativo</p>
 
-### DocWriter é o seu bot do Discord para ajudar a escrever documentos sem precisar sair do aplicativo
+<hr>
 
-</center>
-<br><hr><br>
+# Como funciona?
 
-# **Como funciona?**
+**Para usar o DocWriter basta seguir esses simples passos:**
 
-### Para usar o DocWriter basta seguir esses simples passos:
+1. Convide DocWriter para o seu servidor (No momento indisponível, mais informações em: [Auto-Hospedando o DocWriter](#auto-hospedando-o-docwriter))
+2. Escreva uma mensagem que queira adicionar em seu documento
+3. Use o comando `doc|addcontent` para incluir o texto no documento
+4. Finalize o documento e gere um arquivo PDF usando o comando `doc|exportpdf <nome_do_arquivo>`
 
-<ol>
+<p align="center">
+    <img src="readmeFiles/demonstration.gif" alt="drawing" width="50%"/>
+</p>
 
-### <li>Convide DocWriter para o seu servidor (No momento indisponível, mais informações em: [Auto-Hospedando o DocWriter](#Auto-Hospedando-o-DocWriter))</li>
+<hr>
 
-### <li>Escreva uma mensagem que queira adicionar em seu documento</li>
+# Comandos
 
-### <li>Use o comando `doc|addcontent` para incluir o texto no documento</li>
-
-### <li>Finalize o documento e gere um arquivo PDF usando o comando `doc|exportpdf <nome_do_arquivo>`</li></ol>
-
-<center> 
-
-![demonstration](readmeFiles/demonstration.gif)
-</center>
-
-<br><hr><br>
-
-# **Comandos**
-
-### DocWriter tem dois tipos de comandos: Comandos de utilidade e Comandos de formatação:
-<br>
+DocWriter tem dois tipos de comandos: Comandos de utilidade e Comandos de formatação:
 
 ## Comandos de utilidade
 **doc|addcontent** -> Adiciona a última mensagem ao documento sem finalizar a montagem
@@ -86,51 +76,33 @@
 
 **doc|underline** -> Habilita/desabilita sublinhado na fonte atual
 
-<br><hr><br>
+<hr>
 
-# **Auto-hospedando o DocWriter**
+# <div id="auto-hospedando-o-docwriter">Auto-hospedando o DocWriter</div>
 
-### No momento DocWriter não está disponível publicamente, porém você pode clonar esse repositório e hospedar seu próprio DocWriter na sua máquina!
+**No momento DocWriter não está disponível publicamente, porém você pode clonar esse repositório e hospedar seu próprio DocWriter na sua máquina! Você pode fazer isto seguindo esses passos:**
 
-### Você pode fazer isto seguindo esses passos:
+1. Acesse o **[Portal de desenvolvedores do Discord](https://discord.com/developers/applications)** e logue com sua conta
+2. Inicie uma nova aplicação e dê a ela um nome bacana, como: "DocWriter_Jr"
+3. Vá para a seção "Bot" e adicione um novo bot para sua aplicação
+4. Clone esse repositório na sua máquina, preferencialmente em uma pasta vazia para melhor organização
+5. Volte para a seção "Bot" em sua aplicação e gere um novo token
+6. Crie um arquivo ".env" na raíz do repositório e adicione dentro dele:  `BOT_TOKEN="<token_gerado>"`
+7. Agora, convide seu bot para seu servidor indo para a seção "OAuth2" e depois "URL Generator", selecione o escopo "bot" e inclua as seguintes permissões:
+    * Read Messages/View Channels
+    * Send Messages
+    * Manage Messages
+    * Attach Files
+    * Read Message History
+8. Abra a URL gerada em seu navegador e convide seu "DocWriter_Jr" para seu servidor
+9. Tenha certeza de ter o [Node.Js](https://nodejs.org/en/) instalado em sua máquina (você pode ver qual versão está instalado rodando `node --version` no seu terminal, no caso de nenhuma versão aparecer você deve instalá-lo)
+10. Abra um terminal dentro do diretório do repositório e rode `npm start`
+11. Aproveite seu próprio DocWriter agora funcional no seu servidor! :tada: 
 
-<ol>
+<hr>
 
-### <li>Acesse o [Portal de desenvolvedores do Discord](https://discord.com/developers/applications) e logue com sua conta</li>
+# Licença
 
-### <li>Inicie uma nova aplicação e dê a ela um nome bacana, como: "DocWriter_Jr"</li>
+* **Esse projeto trabalha sob a [MIT License](LICENSE)**
 
-### <li>Vá para a seção "Bot" e adicione um novo bot para sua aplicação</li>
-
-### <li>Clone esse repositório na sua máquina, preferencialmente em uma pasta vazia para melhor organização</li>
-
-### <li>Volte para a seção "Bot" em sua aplicação e gere um novo token</li>
-
-### <li>Crie um arquivo ".env" na raíz do repositório e adicione dentro dele:  `BOT_TOKEN="<token_gerado>"`</li>
-
-### <li>Agora, convide seu bot para seu servidor indo para a seção "OAuth2" e depois "URL Generator", selecione o escopo "bot" e inclua as seguintes permissões:
-<ul>
-    <li>Read Messages/View Channels</li>
-    <li>Send Messages</li>
-    <li>Manage Messages</li>
-    <li>Attach Files</li>
-    <li>Read Message History</li>
-</ul>
-
-### Abra a URL gerada em seu navegador e convide seu "DocWriter_Jr" para seu servidor</li>
-
-### <li>Tenha certeza de ter o [Node.Js](https://nodejs.org/en/) instalado em sua máquina (você pode ver qual versão está instalado rodando `node --version` no seu terminal, no caso de nenhuma versão aparecer você deve instalá-lo)</li>
-
-### <li>Abra um terminal dentro do diretório do repositório e rode `npm start`</li>
-
-### <li>Aproveite seu próprio DocWriter agora funcional no seu servidor! :tada: </li>
-
-<br><hr><br>
-
-# **Licença**
-
-<ul>
-
-### <li>Esse projeto trabalha sob a [MIT License](LICENSE)</li>
-
-### <li>Todas as fontes usadas pelo DocWriter estão disponíveis em: [Google Fonts](https://fonts.google.com)
+* **Todas as fontes usadas pelo DocWriter estão disponíveis em: [Google Fonts](https://fonts.google.com)**
